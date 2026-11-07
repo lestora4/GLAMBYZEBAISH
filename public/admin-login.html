@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1635552701268110');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1635552701268110&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light only">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Glam by Zebaish</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f0ff 0%, #e8dff5 100%);
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 24px;
+            padding: 48px 40px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(106, 27, 154, 0.12);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-logo {
+            width: 260px;
+            height: auto;
+            margin: 0 auto 20px;
+        }
+
+        .login-logo img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+
+        .login-header h1 {
+            font-size: 24px;
+            color: #1a1a1a;
+            font-weight: 700;
+        }
+
+        .login-header p {
+            color: #888;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e8e4ec;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #6a1b9a;
+            box-shadow: 0 0 0 4px rgba(106, 27, 154, 0.08);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #6a1b9a, #4a148c);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(106, 27, 154, 0.3);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s ease-in-out infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 32px 24px;
+            }
+            .login-logo {
+                width: 190px;
+                height: auto;
+            }
+        }
+    </style>
+<style id="glam-uniform-design">
+/* Glam by Zebaish unified CTA system */
+button[type="submit"], button.glam-pkg-addcart, .glam-checkout-btn, .capsule-login-btn, .book-now-btn, .hero-slide-btn, .w-button, .button, .btn {
+  background:#460c61 !important;
+  color:#fff !important;
+  border:1px solid #460c61 !important;
+  min-height:48px !important;
+  padding:0 24px !important;
+  border-radius:10px !important;
+  font-size:.82rem !important;
+  font-weight:800 !important;
+  letter-spacing:.7px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:8px !important;
+  box-shadow:0 6px 18px rgba(70,12,97,.16) !important;
+  text-decoration:none !important;
+  transition:all .2s ease !important;
+}
+button[type="submit"]:hover, button.glam-pkg-addcart:hover, .glam-checkout-btn:hover, .capsule-login-btn:hover, .book-now-btn:hover, .hero-slide-btn:hover, .w-button:hover, .button:hover, .btn:hover {
+  background:#5b1478 !important; color:#fff !important; transform:translateY(-1px);
+}
+/* Dark/image sections: clean white CTA with purple label */
+.hero-slide .hero-slide-btn, .dark-section button, .dark-section .button, .dark-section .btn, .footer button, .footer .button, .footer .btn {
+  background:#fff !important; color:#460c61 !important; border-color:#fff !important;
+}
+.hero-slide .hero-slide-btn:hover, .dark-section button:hover, .dark-section .button:hover, .dark-section .btn:hover, .footer button:hover, .footer .button:hover, .footer .btn:hover {
+  background:#f5eef8 !important; color:#460c61 !important;
+}
+/* Auth actions should never be tiny */
+.capsule-login-btn { width:100% !important; min-width:0 !important; height:50px !important; padding:0 28px !important; border-radius:12px !important; font-size:.88rem !important; }
+.signature-glam-slider-title { white-space:nowrap; }
+@media(max-width:600px){.signature-glam-slider-title{font-size:clamp(1.7rem,8vw,2.5rem);white-space:normal;}.capsule-login-btn{height:50px !important;}}
+</style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="login-logo">
+                <img src="logo.png" alt="Glam by Zebaish Logo">
+            </div>
+            <h1>Admin Login</h1>
+            <p>Glam by Zebaish Dashboard</p>
+        </div>
+
+        <div class="error-message" id="errorMessage">
+            <i class="fa-solid fa-circle-exclamation" style="margin-right: 8px;"></i>
+            <span id="errorText">Invalid credentials</span>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="email" placeholder="admin@glambyzeba.com" required>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="login-btn" id="loginBtn">Login to Dashboard</button>
+        </form>
+
+        <div style="text-align: center; margin-top: 20px; font-size: 13px; color: #999;">
+            <p>Glam by Zebaish Admin Panel</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const errorMsg = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+
+            errorMsg.classList.remove('show');
+
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="spinner"></span> Logging in...';
+
+            try {
+                const response = await fetch('/api/admin/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('adminToken', data.token);
+                    localStorage.setItem('adminData', JSON.stringify(data.admin));
+                    window.location.href = '/admin-dashboard';
+                } else {
+                    errorText.textContent = data.error || 'Invalid credentials';
+                    errorMsg.classList.add('show');
+                }
+            } catch (error) {
+                errorText.textContent = 'Something went wrong. Please try again.';
+                errorMsg.classList.add('show');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = 'Login to Dashboard';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1635552701268110');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1635552701268110&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+    <meta charset="utf-8">
+    <meta name="color-scheme" content="light only">
+    <title>Artist Dashboard - Glam by Zebaish</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Glam by Zebaish" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<style>
+/* ========================================
+   BASE / TOPBAR / HEADER (brand shell)
+   ======================================== */
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    background: #f0eaf5;
+}/* ========================================
+   AFFILIATE-STYLE EARNINGS (matches customer dashboard)
+   ======================================== */
+.affiliate-card {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.10);
+    text-align: center;
+    margin-bottom: 18px;
+}
+.affiliate-card .code-label {
+    color: #888;
+    font-size: 0.7rem;
+    margin-bottom: 4px;
+}
+.affiliate-card .referral-code {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #D4AF37;
+    letter-spacing: 1px;
+    margin: 0;
+}
+.affiliate-card .referral-note {
+    color: #999;
+    font-size: 0.7rem;
+    margin-top: 6px;
+}
+.affiliate-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.affiliate-stat {
+    background: rgba(255, 255, 255, 0.4);
+    padding: 14px 12px;
+    border-radius: 10px;
+    text-align: center;
+    border: 1px solid rgba(212, 175, 55, 0.04);
+}
+.affiliate-stat .number {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #D4AF37;
+}
+.affiliate-stat .label {
+    font-size: 0.6rem;
+    color: #888;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.topbar {
+    height: 38px;
+    background: #2d1243;
+    color: #fff;
+    font: 500 13px/1 'General Sans', Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    letter-spacing: .2px;
+}
+
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .05);
+}
+
+.header-container {
+    max-width: 1500px;
+    margin: auto;
+    height: 110px;
+    padding: 0 45px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+.logo img {
+    width: 260px;
+    height: 130px;
+    display: block;
+    object-fit: contain;
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 5px;
+    z-index: 100;
+    margin-left: auto;
+}
+.hamburger span {
+    width: 28px;
+    height: 3px;
+    background: #2d1243;
+    border-radius: 3px;
+    transition: 0.3s ease;
+}
+.hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
+.hamburger.active span:nth-child(2) { opacity: 0; }
+.hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
+
+.nav-menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 35px;
+    flex: 1;
+}
+.nav-menu a {
+    text-decoration: none;
+    color: #32144a;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .3px;
+    transition: .25s;
+    position: relative;
+    text-transform: uppercase;
+}
+.nav-menu a:hover { color: #c99a31; }
+.nav-menu .active { color: #c99a31; }
+.nav-menu .active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -16px;
+    width: 26px;
+    height: 2px;
+    border-radius: 10px;
+    background: #c99a31;
+}
+
+.login-wrapper {
+    position: relative;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.login-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    width: auto !important;
+    min-width: 118px !important;
+    height: 40px !important;
+    border: 1.8px solid #c99a31 !important;
+    border-radius: 12px !important;
+    text-decoration: none !important;
+    color: #2d1243 !important;
+    transition: .3s !important;
+    background: #fff !important;
+    cursor: pointer !important;
+    padding: 0 16px !important;
+}
+.login-btn:hover { background: #faf8f4 !important; }
+.login-icon {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    background: linear-gradient(135deg, #D4AF37, #B38728) !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+}
+.login-btn span { font: 600 11px 'General Sans', Arial, sans-serif !important; display: block !important; line-height: 1.2 !important; }
+.login-btn small { font: 500 11px 'General Sans', Arial, sans-serif !important; display: block !important; line-height: 1.2 !important; }
+
+.dropdown-arrow {
+    font-size: 10px !important;
+    color: #c99a31 !important;
+    transition: transform 0.3s ease !important;
+    display: inline-block !important;
+    margin-left: 2px !important;
+    flex-shrink: 0 !important;
+    line-height: 1 !important;
+}
+.login-wrapper:hover .dropdown-arrow { transform: rotate(180deg) !important; }
+
+.login-dropdown {
+    position: absolute;
+    right: 0;
+    top: 52px;
+    width: 210px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, .12);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(15px);
+    transition: .3s;
+    overflow: hidden;
+    z-index: 999;
+}
+.login-wrapper:hover .login-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+.dropdown-greeting {
+    padding: 14px 18px 8px;
+    font: 600 14px 'General Sans', Arial, sans-serif;
+    color: #32144a;
+    border-bottom: 1px solid #f0ebf5;
+}
+.login-dropdown a {
+    display: block;
+    padding: 12px 18px;
+    color: #32144a;
+    text-decoration: none;
+    font: 500 13px 'General Sans', Arial, sans-serif;
+    border-bottom: 1px solid #f0ebf5;
+    transition: .2s;
+    cursor: pointer;
+}
+.login-dropdown a:last-child { border-bottom: none; }
+.login-dropdown a:hover { background: #faf6ff; color: #c99a31; }
+
+/* ===== MOBILE SIDEBAR ===== */
+.mobile-sidebar {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 320px;
+    max-width: 90%;
+    height: 100vh;
+    background: #ffffff;
+    padding: 25px;
+    transition: right .35s ease;
+    z-index: 9999;
+    overflow-y: auto;
+    box-shadow: -10px 0 35px rgba(0,0,0,.15);
+    display: flex;
+    flex-direction: column;
+}
+.mobile-sidebar.active { right: 0; }
+
+.mobile-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 38px;
+    height: 38px;
+    border: 1px solid #e5e5e5;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #2d1243;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: .3s;
+}
+.mobile-close:hover { background: #f7f2fa; color: #c99a31; transform: rotate(90deg); }
+
+.mobile-logo { text-align: center; padding: 20px 0; border-bottom: 1px solid #ececec; margin-bottom: 20px; }
+.mobile-logo img { width: 190px; height: auto; }
+.mobile-logo .tagline { color: #777; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-top: 6px; }
+
+.mobile-nav-links { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.mobile-nav-links a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #2d1243;
+    background: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    transition: .25s ease;
+    cursor: pointer;
+}
+.mobile-nav-links a i { width: 20px; text-align: center; color: #c99a31; font-size: 15px; }
+.mobile-nav-links a:hover { background: #f8f3fc; color: #2d1243; transform: translateX(5px); }
+.mobile-nav-links a.active { background: #f3ecfb; color: #c99a31; border-left: 4px solid #c99a31; }
+.mobile-nav-links a.active i { color: #c99a31; }
+
+.mobile-auth-section { margin-top: 18px; padding-top: 18px; border-top: 1px solid #ececec; }
+.mobile-auth-section .auth-btn {
+    width: 100%; display: flex; align-items: center; gap: 14px; padding: 14px;
+    border-radius: 14px; background: #fafafa; border: 1px solid #ececec;
+    text-decoration: none; cursor: pointer; transition: .3s;
+}
+.mobile-auth-section .auth-btn:hover { background: #f7f2fa; border-color: #c99a31; }
+.mobile-auth-section .avatar {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: linear-gradient(135deg,#d4af37,#b38728);
+    color: #2d1243; font-size: 16px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.mobile-auth-section .auth-text { display: flex; flex-direction: column; line-height: 1.3; }
+.mobile-auth-section .auth-text .name { font-size: 14px; font-weight: 700; color: #2d1243; }
+.mobile-auth-section .auth-text .sub { font-size: 11px; color: #777; }
+.mobile-auth-section .fa-chevron-right { margin-left: auto; color: #999 !important; }
+
+.mobile-sidebar-footer { margin-top: auto; padding-top: 18px; border-top: 1px solid #ececec; text-align: center; }
+.mobile-sidebar-footer p { color: #888; font-size: 11px; letter-spacing: 1px; }
+
+.menu-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.45); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    z-index: 9998;
+}
+.menu-overlay.active { display: block; }
+
+@media (max-width: 768px) {
+    .login-wrapper { display: none !important; }
+    .topbar { font-size: 10px; height: 32px; }
+    .header-container { height: 84px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; gap: 0; }
+    .logo { margin: 0; flex: 0 0 auto; }
+    .logo img { width: 190px; height: auto; display: block; }
+    .nav-menu { display: none !important; }
+    .hamburger { display: flex; margin-left: 0; flex-shrink: 0; align-items: center; justify-content: center; width: 42px; height: 42px; }
+    .hamburger span { width: 26px; height: 3px; background: #2d1243; border-radius: 10px; }
+}
+
+.mobile-sidebar::-webkit-scrollbar { width: 3px; }
+.mobile-sidebar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+.mobile-sidebar::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
+
+/* ========================================
+   DASHBOARD LAYOUT — PROFESSIONAL (WHITE / GREY / BLUE / GREEN / RED)
+   ======================================== */
+
+.dashboard-container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+
+.dashboard-title { font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 18px; letter-spacing: -0.3px; }
+.dashboard-title span { color: #6a1b9a; }
+
+.user-greeting {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    margin-bottom: 20px; padding: 16px 20px;
+    background: #ffffff;
+    border-radius: 10px; border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+.user-greeting-left { display: flex; align-items: center; gap: 14px; }
+.user-avatar {
+    width: 44px; height: 44px; background: #6a1b9a;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 1.1rem; font-weight: 700; flex-shrink: 0;
+}
+.user-greeting-text p { margin: 0; font-size: 0.7rem; color: #6b7280; }
+.user-greeting-text h2 { margin: 0; font-size: 1rem; font-weight: 700; color: #1f2937; }
+.user-greeting-text .role-badge {
+    font-size: 0.62rem; color: #6a1b9a; font-weight: 700;
+    background: #f3e5f5; padding: 2px 10px; border-radius: 20px;
+    display: inline-block; margin-top: 4px; border: 1px solid #e1bee7;
+}
+.status-pill {
+    font-size: 0.65rem; font-weight: 700; padding: 3px 12px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: 0.4px;
+}
+.status-pill.approved { background: #f0fdf4; color: #16a34a; }
+.status-pill.pending { background: #fef2f2; color: #dc2626; }
+
+/* Stats Cards */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.stat-card {
+    background: #ffffff;
+    padding: 16px 14px; border-radius: 10px; text-align: center;
+    border: 1px solid #e5e7eb; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+    transition: all 0.2s ease;
+}
+.stat-card:hover {
+    box-shadow: 0 4px 12px rgba(16, 24, 40, 0.08);
+    border-color: #d1d5db;
+}
+.stat-card .number { font-size: 1.4rem; font-weight: 800; color: #6a1b9a; display: block; }
+.stat-card .label { font-size: 0.62rem; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+.stat-card.pending-card .number { color: #dc2626; }
+.stat-card.completed-card .number { color: #16a34a; }
+.stat-card.rating-card .number { color: #b45309; }
+
+.dashboard-wrapper { display: flex; gap: 20px; align-items: flex-start; }
+
+/* Sidebar Navigation */
+.dashboard-sidebar {
+    width: 220px; flex-shrink: 0;
+    background: #ffffff;
+    border-radius: 10px; border: 1px solid #e5e7eb;
+    overflow: hidden; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+.sidebar-item {
+    padding: 11px 16px; background: transparent; border-bottom: 1px solid #e5e7eb;
+    color: #6b7280; text-decoration: none; display: flex; align-items: center; gap: 10px;
+    font-weight: 600; font-size: 0.78rem; transition: all 0.15s ease; cursor: pointer;
+    border-left: 3px solid transparent;
+}
+.sidebar-item:last-child { border-bottom: none; }
+.sidebar-item.active { background: #f3e5f5; color: #4a148c !important; font-weight: 700; border-left-color: #6a1b9a; }
+.sidebar-item.active i { color: #6a1b9a; }
+.sidebar-item:not(.active):hover { background: #f9fafb; color: #1f2937; border-left-color: #d1d5db; }
+.sidebar-item i { width: 18px; color: #9ca3af; font-size: 0.85rem; }
+
+/* Content Area */
+.dashboard-content {
+    flex: 1; background: #ffffff;
+    padding: 22px 24px; border-radius: 10px; border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04); min-height: 350px;
+}
+.content-section { display: none; animation: fadeIn 0.2s ease; }
+.content-section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+.content-section .welcome-text { color: #6b7280; line-height: 1.6; font-size: 0.85rem; }
+
+.section-header {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #e5e7eb;
+}
+.section-header h3 { font-size: 1rem; font-weight: 700; color: #1f2937; margin: 0; }
+.section-header h3 i { color: #6a1b9a; margin-right: 8px; }
+
+.quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin: 14px 0 18px; }
+.quick-action {
+    padding: 14px 12px; background: #ffffff; border-radius: 8px; text-align: center;
+    text-decoration: none; color: #1f2937; border: 1px solid #e5e7eb; transition: all 0.2s ease;
+    cursor: pointer;
+}
+.quick-action:hover { border-color: #6a1b9a; background: #f3e5f5; box-shadow: 0 2px 8px rgba(106, 27, 154, 0.08); }
+.quick-action i { font-size: 1.2rem; color: #6a1b9a; display: block; margin-bottom: 4px; }
+.quick-action span { font-size: 0.72rem; font-weight: 700; color: #1f2937; }
+
+.empty-state { text-align: center; padding: 34px 20px; background: #fafbfc !important; border-radius: 8px; border: 1px dashed #e5e7eb; }
+.empty-state i { font-size: 2.5rem; display: block; margin-bottom: 10px; color: #cbd5e1; }
+.empty-state h4 { color: #1f2937; font-size: 0.95rem; margin: 0 0 4px; font-weight: 700; }
+.empty-state p { margin: 0; font-size: 0.8rem; color: #6b7280; }
+
+/* ========================================
+   BOOKINGS TABLE
+   ======================================== */
+
+.filter-row { display: flex; align-items: center; gap: 10px; }
+.filter-select {
+    padding: 7px 14px; border-radius: 6px; border: 1px solid #e5e7eb;
+    background: #ffffff; font-size: 0.78rem; color: #1f2937; font-weight: 600;
+    outline: none; cursor: pointer;
+}
+.filter-select:focus { border-color: #6a1b9a; }
+
+.table-wrapper { overflow-x: auto; border-radius: 8px; border: 1px solid #e5e7eb; scrollbar-color: #6a1b9a #e8e1f0; scrollbar-width: thin; }
+.table-wrapper::-webkit-scrollbar { height: 10px; }
+.table-wrapper::-webkit-scrollbar-track { background: #e8e1f0; border-radius: 10px; }
+.table-wrapper::-webkit-scrollbar-thumb { background: linear-gradient(135deg,#6a1b9a,#4a148c); border-radius: 10px; border: 1px solid #e8e1f0; }
+.table-wrapper::-webkit-scrollbar-thumb:hover { background: #3a0f70; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 720px; }
+.data-table thead th {
+    text-align: left; padding: 10px 14px; background: #f9fafb;
+    color: #374151; font-weight: 700; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.4px;
+    border-bottom: 1px solid #e5e7eb; white-space: nowrap;
+}
+.data-table tbody td { padding: 11px 14px; border-bottom: 1px solid #f0f0f0; color: #374151; vertical-align: middle; }
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table tbody tr:hover { background: #fafbfc; }
+
+.badge {
+    display: inline-block; padding: 3px 11px; border-radius: 20px; font-size: 0.65rem;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;
+}
+/* Professional blue / amber / emerald / rose palette — no purple. */
+.badge-pending { background: #fffbeb; color: #b45309; }
+.badge-accepted { background: #eff6ff; color: #1d4ed8; }
+.badge-completed { background: #ecfdf5; color: #047857; }
+.badge-cancelled { background: #fff1f2; color: #be123c; }
+
+/* Rate & Review column */
+.review-cell { display: flex; flex-direction: column; gap: 2px; max-width: 220px; }
+.review-stars { color: #d97706; font-size: 0.78rem; letter-spacing: 1px; }
+.review-comment {
+    font-size: 0.7rem; color: #6b7280; white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis; max-width: 220px;
+}
+.review-none { font-size: 0.72rem; color: #9ca3af; font-style: italic; }
+
+.action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.btn-accept, .btn-reject {
+    border: none; border-radius: 6px; padding: 6px 12px; font-size: 0.7rem; font-weight: 700;
+    cursor: pointer; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 0.3px;
+    display: inline-flex; align-items: center; gap: 5px;
+}
+.btn-accept { background: #16a34a; color: #fff; }
+.btn-accept:hover { background: #15803d; }
+.btn-reject { background: #dc2626; color: #fff; }
+.btn-reject:hover { background: #b91c1c; }
+.btn-accept:disabled, .btn-reject:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ========================================
+   BOOKING CARDS
+   Same visual language as the customer dashboard's order cards, so a
+   booking looks like "the same object" from either side: rounded
+   thumbnail, bold title + labeled detail lines, price/status stacked
+   top-right, and a card-width action area at the bottom of that column.
+   ======================================== */
+.orders-list { display: flex; flex-direction: column; gap: 16px; }
+
+.order-card {
+    background: #ffffff;
+    border: 1px solid #edeff2;
+    border-radius: 18px;
+    padding: 22px 24px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    text-align: left;
+}
+.order-card:hover { border-color: #dbe0e6; box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06); }
+
+.order-card-top { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+.order-card-left { display: flex; gap: 16px; flex: 1; min-width: 240px; }
+
+.order-thumb {
+    width: 86px; height: 86px; border-radius: 18px; object-fit: cover; flex-shrink: 0;
+    border: 1px solid #e5e7eb; background: #f3e5f5;
+}
+.order-thumb-fallback {
+    width: 86px; height: 86px; border-radius: 18px;
+    background: linear-gradient(135deg, #f6d9ec 0%, #cfe0ec 100%); color: #7c5a86;
+    display: flex; align-items: center; justify-content: center; font-size: 1.7rem; flex-shrink: 0;
+}
+
+.order-card-info { min-width: 0; }
+.order-title { margin: 0 0 2px; font-size: 1.2rem; font-weight: 700; color: #111827; }
+.order-id { margin: 0 0 10px; font-size: 0.85rem; color: #9ca3af; font-weight: 500; }
+.order-detail-line { font-size: 0.95rem; color: #1f2937; margin: 6px 0; line-height: 1.4; }
+.order-detail-line strong { font-weight: 700; color: #111827; }
+
+.order-card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; min-width: 190px; text-align: right; }
+.order-price { font-size: 1.55rem; font-weight: 800; color: #111827; white-space: nowrap; }
+
+.order-pill {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600;
+    padding: 5px 14px; border-radius: 999px; border: 1px solid transparent; white-space: nowrap; letter-spacing: 0.1px;
+}
+.order-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.order-pill.pill-success { background: #ecfdf5; color: #15803d; border-color: #a7f3d0; }
+.order-pill.pill-rose    { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+.order-pill.pill-blue    { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+.order-pill.pill-yellow  { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+.order-pill.pill-neutral { background: #f9fafb; color: #6b7280; border-color: #e5e7eb; }
+
+.order-card-action { width: 100%; display: flex; justify-content: flex-end; gap: 8px; margin-top: 2px; }
+.order-card-action .btn-accept, .order-card-action .btn-reject {
+    flex: 1; justify-content: center; padding: 11px 16px; border-radius: 14px; font-size: 0.82rem;
+}
+
+.order-review-stars { display: inline-flex; align-items: center; gap: 3px; font-size: 1.05rem; letter-spacing: 0; }
+.order-review-stars i { color: #d97706 !important; }
+.order-review-note { font-size: 0.82rem; color: #9ca3af; font-style: italic; }
+
+@media (max-width: 640px) {
+    .order-card-top { flex-direction: column; align-items: stretch; }
+    .order-card-right { align-items: flex-start; text-align: left; width: 100%; }
+    .order-card-action { justify-content: flex-start; }
+}
+
+/* ========================================
+   FORM STYLES (profile)
+   ======================================== */
+
+.settings-form .form-group { margin-bottom: 14px; }
+.settings-form .form-group label { display: block; font-size: 0.72rem; font-weight: 700; color: #1f2937; margin-bottom: 4px; }
+.settings-form .form-group input,
+.settings-form .form-group textarea {
+    width: 100%; padding: 9px 12px; border: 1px solid #e5e7eb; border-radius: 6px;
+    font-size: 0.82rem; outline: none; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    background: #ffffff; color: #1f2937; font-family: inherit;
+}
+.settings-form .form-group input:focus,
+.settings-form .form-group textarea:focus { border-color: #6a1b9a; box-shadow: 0 0 0 3px rgba(106, 27, 154, 0.1); }
+.settings-form .form-group input:disabled { color: #9ca3af; cursor: not-allowed; background: #f9fafb; }
+.settings-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.btn-save {
+    padding: 9px 24px; background: #6a1b9a; color: #fff; border: none;
+    border-radius: 6px; font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: all 0.2s ease;
+    display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-save:hover { background: #4a148c; }
+.btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-save.small { padding: 7px 14px; font-size: 0.7rem; }
+
+/* ========================================
+   AFFILIATE-STYLE EARNINGS CARD (matches customer dashboard's Affiliate section)
+   ======================================== */
+.affiliate-card {
+    background: #f3e5f5;
+    padding: 22px;
+    border-radius: 10px;
+    border: 1px solid #e1bee7;
+    text-align: center;
+    margin-bottom: 18px;
+}
+.affiliate-card .code-label { color: #6b7280; font-size: 0.7rem; margin-bottom: 4px; }
+.affiliate-card .referral-code { font-size: 1.6rem; font-weight: 800; color: #4a148c; letter-spacing: 1px; margin: 0; }
+.affiliate-card .referral-note { color: #6b7280; font-size: 0.7rem; margin-top: 6px; }
+.affiliate-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+.affiliate-stat {
+    background: #ffffff;
+    padding: 14px 12px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #e5e7eb;
+}
+.affiliate-stat .number { display: block; font-size: 1.2rem; font-weight: 800; color: #16a34a; }
+.affiliate-stat .label { font-size: 0.6rem; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+@media screen and (max-width: 480px) {
+    .affiliate-stats { grid-template-columns: 1fr; }
+}
+
+.loading-spinner { text-align: center; padding: 40px 20px; color: #6b7280; font-size: 0.85rem; }
+.loading-spinner i { font-size: 1.6rem; color: #6a1b9a; display: block; margin-bottom: 10px; }
+
+.inline-error {
+    color: #dc2626; font-size: 0.8rem; text-align: center; padding: 10px;
+    background: #fef2f2; border-radius: 8px; border: 1px solid #fecaca; margin-bottom: 14px;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media screen and (max-width: 991px) {
+    .dashboard-wrapper { flex-direction: column; gap: 16px; }
+    .dashboard-sidebar { width: 100%; display: flex; flex-wrap: wrap; }
+    .sidebar-item { flex: 1 1 auto; justify-content: center; padding: 10px 12px; font-size: 0.78rem; border-left: none; border-bottom: 3px solid transparent; }
+    .sidebar-item.active { border-left: none; border-bottom-color: #6a1b9a; }
+    .dashboard-content { padding: 18px 18px; }
+}
+
+@media screen and (max-width: 767px) {
+    .dashboard-container { margin: 12px auto; padding: 0 14px; }
+    .dashboard-title { font-size: 1.3rem; }
+    .user-greeting { padding: 12px 16px; flex-direction: column; align-items: flex-start; }
+    .user-greeting-left { width: 100%; }
+    .user-avatar { width: 40px; height: 40px; font-size: 1rem; }
+    .user-greeting-text h2 { font-size: 0.9rem; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .stat-card .number { font-size: 1.2rem; }
+    .dashboard-content { padding: 14px 14px; }
+    .quick-actions { grid-template-columns: repeat(2, 1fr); }
+    .settings-form .form-row { grid-template-columns: 1fr; }
+    .earnings-summary { grid-template-columns: 1fr 1fr; }
+}
+
+@media screen and (max-width: 480px) {
+    .dashboard-container { margin: 8px auto; padding: 0 10px; }
+    .dashboard-title { font-size: 1.1rem; margin-bottom: 12px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat-card { padding: 10px 8px; }
+    .stat-card .number { font-size: 1rem; }
+    .stat-card .label { font-size: 0.55rem; }
+    .sidebar-item { font-size: 0.7rem; padding: 8px 8px; }
+    .dashboard-content { padding: 12px 10px; }
+    .earnings-summary { grid-template-columns: 1fr; }
+}
+</style>
+<style id="glam-uniform-design">
+/* Glam by Zebaish unified CTA system */
+button[type="submit"], button.glam-pkg-addcart, .glam-checkout-btn, .capsule-login-btn, .book-now-btn, .hero-slide-btn, .w-button, .button, .btn {
+  background:#6a1b9a !important;
+  color:#fff !important;
+  border:1px solid #6a1b9a !important;
+  min-height:48px !important;
+  padding:0 24px !important;
+  border-radius:10px !important;
+  font-size:.82rem !important;
+  font-weight:800 !important;
+  letter-spacing:.7px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:8px !important;
+  box-shadow:0 6px 18px rgba(106,27,154,.16) !important;
+  text-decoration:none !important;
+  transition:all .2s ease !important;
+}
+button[type="submit"]:hover, button.glam-pkg-addcart:hover, .glam-checkout-btn:hover, .capsule-login-btn:hover, .book-now-btn:hover, .hero-slide-btn:hover, .w-button:hover, .button:hover, .btn:hover {
+  background:#4a148c !important; color:#fff !important; transform:translateY(-1px);
+}
+/* Dark/image sections: clean white CTA with blue label */
+.hero-slide .hero-slide-btn, .dark-section button, .dark-section .button, .dark-section .btn, .footer button, .footer .button, .footer .btn {
+  background:#fff !important; color:#6a1b9a !important; border-color:#fff !important;
+}
+.hero-slide .hero-slide-btn:hover, .dark-section button:hover, .dark-section .button:hover, .dark-section .btn:hover, .footer button:hover, .footer .button:hover, .footer .btn:hover {
+  background:#f3e5f5 !important; color:#6a1b9a !important;
+}
+/* Auth actions should never be tiny */
+.capsule-login-btn { width:100% !important; min-width:0 !important; height:50px !important; padding:0 28px !important; border-radius:12px !important; font-size:.88rem !important; }
+.signature-glam-slider-title { white-space:nowrap; }
+@media(max-width:600px){.signature-glam-slider-title{font-size:clamp(1.7rem,8vw,2.5rem);white-space:normal;}.capsule-login-btn{height:50px !important;}}
+</style>
+</head>
+<body>
+
+<!-- ===== TOP BAR ===== -->
+<div class="topbar">
+    ✨ Glam by Zebaish — Artist Portal ✨
+</div>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+    <div class="header-container">
+        <a href="/" class="logo">
+            <img src="logo.png" alt="Glam by Zebaish">
+        </a>
+
+        <nav class="nav-menu" id="navMenu">
+            <a href="/">HOME</a>
+            <a href="/about">ABOUT US</a>
+            <a href="/#whychooseus">WHY CHOOSE US</a>
+            <a href="/#packages">PACKAGES</a>
+            <a href="/blog">BLOG</a>
+            <a href="/#faq">FAQ</a>
+            <a href="/contact">CONTACT US</a>
+        </nav>
+
+        <div class="hamburger" id="hamburger">
+            <span></span><span></span><span></span>
+        </div>
+
+        <div class="login-wrapper" id="desktopLoginWrapper">
+            <div class="login-btn" id="loginBtn">
+                <div class="login-icon" id="headerAvatar">A</div>
+                <div id="loginText">
+                    <span id="headerName">Artist</span>
+                    <small>My Account</small>
+                </div>
+                <span class="dropdown-arrow">▼</span>
+            </div>
+            <div class="login-dropdown">
+                <div class="dropdown-greeting" id="greetingText">👋 Welcome!</div>
+                <a href="#" onclick="switchSection('profile'); return false;">My Profile</a>
+                <a href="#" onclick="switchSection('earnings'); return false;">Earnings</a>
+                <a href="#" onclick="logoutUser(); return false;">Logout</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ===== MOBILE SIDEBAR ===== -->
+<div class="mobile-sidebar" id="mobileSidebar">
+    <div class="mobile-close" id="mobileClose"><i class="fas fa-times"></i></div>
+    <div class="mobile-logo">
+        <img src="logo.png" alt="Glam by Zebaish">
+        <div class="tagline">Artist Portal</div>
+    </div>
+    <nav class="mobile-nav-links">
+        <a href="#" class="active" onclick="switchSection('dashboard'); closeMobileMenu(); return false;"><i class="fa-solid fa-chart-simple"></i> Dashboard</a>
+        <a href="#" onclick="switchSection('bookings'); closeMobileMenu(); return false;"><i class="fa-regular fa-calendar-check"></i> My Bookings</a>
+        <a href="#" onclick="switchSection('profile'); closeMobileMenu(); return false;"><i class="fa-regular fa-user"></i> Profile</a>
+      <a href="#" onclick="switchSection('earnings'); closeMobileMenu(); return false;">
+    <i class="fa-solid fa-gift"></i> Affiliate
+</a>
+        <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="/about"><i class="fa-regular fa-circle-question"></i> About Us</a>
+        <a href="/contact"><i class="fa-regular fa-envelope"></i> Contact Us</a>
+    </nav>
+    <div class="mobile-auth-section">
+        <div class="auth-btn" onclick="logoutUser()">
+            <div class="avatar" id="mobileAvatar">A</div>
+            <div class="auth-text">
+                <span class="name" id="mobileUserName">Artist</span>
+                <span class="sub">Logout</span>
+            </div>
+            <i class="fas fa-chevron-right"></i>
+        </div>
+    </div>
+    <div class="mobile-sidebar-footer"><p>© 2026 Glam by Zebaish</p></div>
+</div>
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="dashboard-container">
+
+    <h1 class="dashboard-title">Artist <span>Dashboard</span></h1>
+
+    <div class="user-greeting">
+        <div class="user-greeting-left">
+            <div class="user-avatar" id="greetingAvatar">A</div>
+            <div class="user-greeting-text">
+                <p>Welcome back! ✨</p>
+                <h2 id="artistNameDisplay">Artist</h2>
+                <span class="role-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Makeup Artist</span>
+            </div>
+        </div>
+        <div style="text-align: right;">
+            <span style="font-size: 0.65rem; color: #888; display: block; margin-bottom: 4px;">Account status</span>
+            <span class="status-pill approved" id="statusPill">Active</span>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="number" id="statTotalBookings">—</span>
+            <span class="label">Total Bookings</span>
+        </div>
+        <div class="stat-card pending-card">
+            <span class="number" id="statPendingBookings">—</span>
+            <span class="label">Pending Bookings</span>
+        </div>
+        <div class="stat-card completed-card">
+            <span class="number" id="statCompletedBookings">—</span>
+            <span class="label">Completed Bookings</span>
+        </div>
+        <div class="stat-card">
+            <span class="number" id="statTotalEarnings">—</span>
+            <span class="label">Total Earnings</span>
+        </div>
+        <div class="stat-card rating-card">
+            <span class="number" id="statRating">—</span>
+            <span class="label" id="statRatingLabel">Rating</span>
+        </div>
+    </div>
+
+    <div class="dashboard-wrapper">
+
+        <!-- Sidebar -->
+        <nav class="dashboard-sidebar">
+            <div class="sidebar-item active" data-section="dashboard">
+                <i class="fa-solid fa-chart-simple"></i> Dashboard
+            </div>
+            <div class="sidebar-item" data-section="bookings">
+                <i class="fa-regular fa-calendar-check"></i> My Bookings
+            </div>
+            <div class="sidebar-item" data-section="profile">
+                <i class="fa-regular fa-user"></i> Profile
+            </div>
+          <div class="sidebar-item" data-section="earnings">
+    <i class="fa-solid fa-gift"></i> Affiliate
+</div>   <a href="#" onclick="logoutUser(); return false;" class="sidebar-item" style="color: #dc2626; border-top: 1px solid #f0edf2;">
+                <i class="fa-solid fa-right-from-bracket" style="color: #dc2626;"></i> Logout
+            </a>
+        </nav>
+
+        <!-- Content -->
+        <main class="dashboard-content">
+
+            <!-- ============ DASHBOARD OVERVIEW ============ -->
+            <div class="content-section active" id="section-dashboard">
+                <p class="welcome-text">
+                    Welcome back, <strong id="dashboardArtistName">Artist</strong>! Here's a quick look at how your bookings are going.
+                </p>
+
+                <div class="quick-actions">
+                    <a href="#" onclick="switchSection('bookings')" class="quick-action">
+                        <i class="fa-regular fa-calendar-check"></i>
+                        <span>View Bookings</span>
+                    </a>
+                    <a href="#" onclick="switchSection('profile')" class="quick-action">
+                        <i class="fa-regular fa-user"></i>
+                        <span>Edit Profile</span>
+                    </a>
+                    <a href="#" onclick="switchSection('earnings')" class="quick-action">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                        <span>Earnings</span>
+                    </a>
+                </div>
+
+                <div id="dashboardRecentWrap">
+                    <div class="empty-state" style="padding: 20px 16px; background: #fafbfc; border-radius: 10px;">
+                        <i class="fa-regular fa-calendar" style="font-size: 2rem;"></i>
+                        <h4 style="color: #888; font-size: 0.85rem;">No pending bookings right now</h4>
+                        <p style="color: #bbb; font-size: 0.75rem;">New booking requests will show up here.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ MY BOOKINGS ============ -->
+            <div class="content-section" id="section-bookings">
+                <div class="section-header">
+                    <h3><i class="fa-regular fa-calendar-check"></i> My Bookings</h3>
+                    <div class="filter-row">
+                        <select class="filter-select" id="bookingStatusFilter" onchange="renderBookings()">
+                            <option value="ALL">All Statuses</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="ACCEPTED">Accepted</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="bookingsWrap">
+                    <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i> Loading bookings...</div>
+                </div>
+            </div>
+
+            <!-- ============ PROFILE ============ -->
+            <div class="content-section" id="section-profile">
+                <div class="section-header">
+                    <h3><i class="fa-regular fa-user"></i> My Profile</h3>
+                </div>
+
+                <div id="profileWrap">
+                    <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i> Loading profile...</div>
+                </div>
+
+                <div class="section-header" style="margin-top:28px;">
+                    <h3><i class="fa-solid fa-key"></i> Login Credentials</h3>
+                </div>
+                <form class="settings-form" id="credentialsForm" onsubmit="saveCredentials(event)">
+                    <div id="credentialsError" class="inline-error" style="display:none;"></div>
+                    <div id="credentialsSuccess" style="display:none; color:#1a7f37; font-size:0.85rem; background:#eafbe9; border:1px solid #b7ebc0; padding:10px 14px; border-radius:8px; margin-bottom:14px;"></div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" id="credUsername" placeholder="Used to log in, along with email" />
+                        </div>
+                        <div class="form-group">
+                            <label>Current Password</label>
+                            <input type="password" id="credCurrentPassword" placeholder="Required to confirm changes" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <input type="password" id="credNewPassword" placeholder="Leave blank to keep current password" />
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm New Password</label>
+                            <input type="password" id="credConfirmPassword" placeholder="Re-enter new password" />
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-save" id="credentialsSaveBtn">
+                        <i class="fa-solid fa-floppy-disk"></i> Update Credentials
+                    </button>
+                </form>
+            </div>
+
+           <!-- ============ AFFILIATE EARNINGS ============ -->
+<div class="content-section" id="section-earnings">
+    <div class="section-header">
+        <h3><i class="fa-solid fa-gift"></i> Affiliate Earnings</h3>
+        <span style="font-size: 0.7rem; color: #888;">Refer & earn</span>
+    </div>
+    <div id="earningsWrap">
+        <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i> Loading earnings...</div>
+    </div>
+</div>
+
+        </main>
+    </div>
+</div>
+
+<!-- ========================================
+     FOOTER - Glam by Zebaish
+     ======================================== -->
+<section class="footer" style="background: linear-gradient(135deg, #1a0a1f 0%, #2a0a3a 40%, #4a1562 70%, #2a0a3a 100%); padding: 70px 20px 25px; position: relative; overflow: hidden;">
+
+    <!-- Decorative Gold Line Top -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, #D4AF37, #F5E6C8, #D4AF37, transparent);"></div>
+
+    <!-- Decorative Glow Orbs -->
+    <div style="position: absolute; bottom: -100px; right: -100px; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle, rgba(212, 175, 55, 0.04) 0%, transparent 70%); pointer-events: none;"></div>
+    <div style="position: absolute; top: -100px; left: -100px; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(212, 175, 55, 0.03) 0%, transparent 70%); pointer-events: none;"></div>
+
+    <div class="w-layout-blockcontainer container w-container" style="max-width: 1200px; margin: 0 auto; position: relative; z-index: 1;">
+        <div class="footer-inner">
+
+            <!-- Footer Top -->
+            <div class="footer-top" style="display: grid; grid-template-columns: 1.6fr 1fr 1fr 1.2fr; gap: 40px; padding-bottom: 40px; border-bottom: 1px solid rgba(212, 175, 55, 0.08);">
+
+                <!-- Brand Info -->
+                <div class="footer-left">
+                    <a href="/" class="brand w-inline-block" style="display: inline-block;">
+                        <img loading="eager" src="aa.png" alt="Glam by Zebaish" style="width: 220px; height: auto; margin-bottom: 18px;">
+                    </a>
+                    <p style="color: #d4c4d8 !important; font-size: 0.95rem; line-height: 1.8; margin-bottom: 20px; max-width: 320px;">
+                        Professional makeup artistry at your doorstep. Empowering beauty, creating careers, building futures.
+                    </p>
+                    <!-- Social Media Links - Facebook & Instagram -->
+                    <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                        <a href="https://www.facebook.com/people/Glam-by-Zebaish/61594240403449/" target="_blank" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.2); color: #D4AF37 !important; font-size: 1.2rem; text-decoration: none; transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);">
+                            <i class="fa-brands fa-facebook-f"></i>
+                        </a>
+                        <a href="https://www.instagram.com/glambyzebaish?igsi=MWhrbGJhYmI1OWQxaA%3D%3D&utm_source=qr" target="_blank" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.2); color: #D4AF37 !important; font-size: 1.2rem; text-decoration: none; transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <div style="color: #d4c4d8 !important; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px;">Quick Links</div>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <a href="/" class="footer-link" style="color: #D4AF37 !important; text-decoration: none; font-size: 1.05rem !important; font-weight: 600 !important; transition: all 0.3s ease; position: relative;">Home</a>
+                        <a href="/about" class="footer-link" style="color: #D4AF37 !important; text-decoration: none; font-size: 1.05rem !important; font-weight: 600 !important; transition: all 0.3s ease; position: relative;">About Us</a>
+                        <a href="/#packages" class="footer-link" style="color: #D4AF37 !important; text-decoration: none; font-size: 1.05rem !important; font-weight: 600 !important; transition: all 0.3s ease; position: relative;">Packages</a>
+                        <a href="/blog" class="footer-link" style="color: #D4AF37 !important; text-decoration: none; font-size: 1.05rem !important; font-weight: 600 !important; transition: all 0.3s ease; position: relative;">Blog</a>
+                        <a href="/contact" class="footer-link" style="color: #D4AF37 !important; text-decoration: none; font-size: 1.05rem !important; font-weight: 600 !important; transition: all 0.3s ease; position: relative;">Contact</a>
+                    </div>
+                </div>
+
+                <!-- Support -->
+                <div>
+                    <div style="color: #d4c4d8 !important; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px;">Support</div>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <a href="/#faq" class="footer-link" style="color: #D4AF37 !important; text-decoration: none; font-size: 1.05rem !important; font-weight: 600 !important; transition: all 0.3s ease; position: relative;">FAQ</a>
+                        <a href="/#whychooseus" class="footer-link" style="color: #D4AF37 !important; text-decoration: none; font-size: 1.05rem !important; font-weight: 600 !important; transition: all 0.3s ease; position: relative;">Why Choose Us</a>
+                        <a href="/privacy-policy" class="footer-link" style="color: #D4AF37 !important; text-decoration: none; font-size: 1.05rem !important; font-weight: 600 !important; transition: all 0.3s ease; position: relative;">Privacy Policy</a>
+                        <a href="/terms" class="footer-link" style="color: #D4AF37 !important; text-decoration: none; font-size: 1.05rem !important; font-weight: 600 !important; transition: all 0.3s ease; position: relative;">Terms &amp; Conditions</a>
+                    </div>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <div style="color: #d4c4d8 !important; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px;">Contact</div>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <!-- Email -->
+                        <div style="display: flex; align-items: center; gap: 10px; color: #d4c4d8 !important; font-size: 0.9rem;">
+                            <i class="fa-regular fa-envelope" style="color: #D4AF37; font-size: 0.9rem; min-width: 18px;"></i>
+                            <span style="color: #d4c4d8 !important;">hello@glambyzebaish.com</span>
+                        </div>
+                        <!-- Phone -->
+                        <div style="display: flex; align-items: center; gap: 10px; color: #d4c4d8 !important; font-size: 0.9rem;">
+                            <i class="fa-solid fa-phone" style="color: #D4AF37; font-size: 0.9rem; min-width: 18px;"></i>
+                            <span style="color: #d4c4d8 !important;">+91 9505777790</span>
+                        </div>
+                        <!-- Address -->
+                        <div style="display: flex; align-items: flex-start; gap: 10px; color: #d4c4d8 !important; font-size: 0.9rem;">
+                            <i class="fa-solid fa-location-dot" style="color: #D4AF37; font-size: 0.9rem; min-width: 18px; margin-top: 3px;"></i>
+                            <span style="color: #d4c4d8 !important; line-height: 1.6;">Hyderabad,Telangana</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer Bottom - Copyright -->
+            <div class="footer-bottom" style="padding-top: 25px; margin-top: 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                <div style="color: #d4c4d8 !important; font-size: 0.9rem;">
+                    © 2026 <span style="color: #D4AF37 !important; font-weight: 700;">Glam by Zebaish</span>. All rights reserved.
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+       
+                    <div style="color: #d4c4d8 !important; font-size: 0.85rem;">
+                        Designed &amp; Developed by <a href="https://www.lestora.com" target="_blank" style="color: #D4AF37 !important; text-decoration: none; font-weight: 700; font-size: 0.9rem; transition: all 0.3s ease;"> Lestora Technologies</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<script>
+// ========================================
+// AUTH GUARD
+// ========================================
+const API_BASE = '';
+let artistUser = null;
+let artistToken = null;
+let allBookings = [];
+let profileData = null;
+
+function authHeaders(extra) {
+    const headers = Object.assign({}, extra || {});
+    if (artistToken) headers['Authorization'] = `Bearer ${artistToken}`;
+    return headers;
+}
+
+function getInitials(name) {
+    if (!name) return 'A';
+    const parts = name.trim().split(' ');
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    artistToken = localStorage.getItem('userToken');
+    const userData = localStorage.getItem('user');
+
+    if (!artistToken || !userData) {
+        window.location.href = '/login';
+        return;
+    }
+
+    try {
+        artistUser = JSON.parse(userData);
+    } catch (e) {
+        window.location.href = '/login';
+        return;
+    }
+
+    const name = artistUser.name || 'Artist';
+    const initials = getInitials(name);
+    document.getElementById('headerName').textContent = name.split(' ')[0];
+    document.getElementById('headerAvatar').textContent = initials;
+    document.getElementById('greetingText').textContent = `👋 Welcome, ${name.split(' ')[0]}!`;
+    document.getElementById('artistNameDisplay').textContent = name;
+    document.getElementById('dashboardArtistName').textContent = name.split(' ')[0];
+    document.getElementById('greetingAvatar').textContent = initials;
+    document.getElementById('mobileUserName').textContent = name;
+    document.getElementById('mobileAvatar').textContent = initials;
+
+    loadDashboardStats();
+    loadBookings();
+    loadProfile();
+    loadEarnings();
+});
+
+function logoutUser() {
+    if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('user');
+        localStorage.removeItem('userToken');
+        localStorage.removeItem('userRole');
+        window.location.href = '/login';
+    }
+}
+
+// ========================================
+// MOBILE MENU
+// ========================================
+const hamburger = document.getElementById('hamburger');
+const mobileSidebar = document.getElementById('mobileSidebar');
+const menuOverlay = document.getElementById('menuOverlay');
+const mobileClose = document.getElementById('mobileClose');
+
+function openMobileMenu() {
+    hamburger.classList.add('active');
+    mobileSidebar.classList.add('active');
+    menuOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+function closeMobileMenu() {
+    hamburger.classList.remove('active');
+    mobileSidebar.classList.remove('active');
+    menuOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
+hamburger.addEventListener('click', openMobileMenu);
+mobileClose.addEventListener('click', closeMobileMenu);
+menuOverlay.addEventListener('click', closeMobileMenu);
+
+// ========================================
+// SECTION SWITCHING
+// ========================================
+function switchSection(section) {
+    document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.sidebar-item[data-section]').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.mobile-nav-links a').forEach(el => el.classList.remove('active'));
+
+    const target = document.getElementById(`section-${section}`);
+    if (target) target.classList.add('active');
+
+    const sidebarItem = document.querySelector(`.sidebar-item[data-section="${section}"]`);
+    if (sidebarItem) sidebarItem.classList.add('active');
+}
+
+document.querySelectorAll('.sidebar-item[data-section]').forEach(function(item) {
+    item.addEventListener('click', function() {
+        switchSection(this.getAttribute('data-section'));
+    });
+});
+
+// ========================================
+// FORMATTERS
+// ========================================
+function formatCurrency(amount) {
+    const n = Number(amount) || 0;
+    return '₹' + n.toLocaleString('en-IN');
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '—';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function statusBadgeClass(status) {
+    switch ((status || '').toUpperCase()) {
+        case 'PENDING': return 'badge-pending';
+        case 'ACCEPTED': return 'badge-accepted';
+        case 'COMPLETED': return 'badge-completed';
+        case 'CANCELLED': return 'badge-cancelled';
+        default: return 'badge-pending';
+    }
+}
+
+// ========================================
+// DASHBOARD STATS — GET /api/artist/dashboard
+// ========================================
+async function loadDashboardStats() {
+    try {
+        const response = await fetch('/api/artist/dashboard', { headers: authHeaders() });
+        if (response.status === 401) return handleUnauthorized();
+        const data = await response.json();
+
+        if (data.success && data.stats) {
+            document.getElementById('statTotalBookings').textContent = data.stats.totalBookings ?? 0;
+            document.getElementById('statPendingBookings').textContent = data.stats.pendingBookings ?? 0;
+            document.getElementById('statCompletedBookings').textContent = data.stats.completedBookings ?? 0;
+            document.getElementById('statTotalEarnings').textContent = formatCurrency(data.stats.totalEarnings);
+
+            const totalReviews = data.stats.totalReviews ?? 0;
+            document.getElementById('statRating').textContent = totalReviews > 0
+                ? `${Number(data.stats.rating ?? 0).toFixed(1)} ★`
+                : '—';
+            document.getElementById('statRatingLabel').textContent = totalReviews > 0
+                ? `Rating (${totalReviews} review${totalReviews === 1 ? '' : 's'})`
+                : 'No reviews yet';
+        }
+    } catch (error) {
+        console.error('❌ Failed to load dashboard stats:', error);
+        ['statTotalBookings','statPendingBookings','statCompletedBookings','statTotalEarnings','statRating'].forEach(id => {
+            document.getElementById(id).textContent = '—';
+        });
+    }
+}
+
+// ========================================
+// BOOKINGS — GET /api/artist/bookings
+// ========================================
+async function loadBookings() {
+    const wrap = document.getElementById('bookingsWrap');
+    try {
+        const response = await fetch('/api/artist/bookings', { headers: authHeaders() });
+        if (response.status === 401) return handleUnauthorized();
+        const data = await response.json();
+
+        if (data.success) {
+            allBookings = data.bookings || [];
+            renderBookings();
+            renderDashboardPending();
+        } else {
+            wrap.innerHTML = `<div class="inline-error">${data.error || 'Failed to load bookings.'}</div>`;
+        }
+    } catch (error) {
+        console.error('❌ Failed to load bookings:', error);
+        wrap.innerHTML = '<div class="inline-error">Could not load bookings. Please refresh and try again.</div>';
+    }
+}
+
+// Booking-status pills mirror the customer dashboard's palette so a
+// booking reads the same way from either side (yellow = needs
+// attention, blue = in progress, emerald = done, rose = cancelled).
+const bookingStatusPill = {
+    'PENDING':   { cls: 'pill-yellow',  label: 'Needs Response' },
+    'ACCEPTED':  { cls: 'pill-blue',    label: 'Accepted' },
+    'COMPLETED': { cls: 'pill-success', label: 'Completed' },
+    'CANCELLED': { cls: 'pill-rose',    label: 'Cancelled' },
+};
+const bookingPayPill = {
+    'PENDING':  { cls: 'pill-rose',    label: 'Unpaid' },
+    'PAID':     { cls: 'pill-success', label: 'Paid' },
+    'FAILED':   { cls: 'pill-rose',    label: 'Failed — Unpaid' },
+    'REFUNDED': { cls: 'pill-blue',    label: 'Refunded' },
+};
+
+function renderBookings() {
+    const wrap = document.getElementById('bookingsWrap');
+    const filter = document.getElementById('bookingStatusFilter').value;
+    const filtered = filter === 'ALL' ? allBookings : allBookings.filter(b => (b.status || '').toUpperCase() === filter);
+
+    if (!filtered.length) {
+        wrap.innerHTML = `
+            <div class="empty-state">
+                <i class="fa-regular fa-calendar-xmark"></i>
+                <h4>No bookings found</h4>
+                <p>${filter === 'ALL' ? "You don't have any bookings yet." : 'No bookings match this filter.'}</p>
+            </div>`;
+        return;
+    }
+
+    const cards = filtered.map(b => {
+        const status = (b.status || 'PENDING').toUpperCase();
+        const isPending = status === 'PENDING';
+        const isCompleted = status === 'COMPLETED';
+        const statusInfo = bookingStatusPill[status] || { cls: 'pill-neutral', label: status };
+        const pay = bookingPayPill[(b.paymentStatus || '').toUpperCase()] || { cls: 'pill-neutral', label: b.paymentStatus || 'N/A' };
+        const packageName = b.packageName || b.package || 'Service';
+
+        let actionHtml = '';
+        if (isPending) {
+            actionHtml = `
+                <button class="btn-accept" onclick="acceptBooking('${b.id}')"><i class="fa-solid fa-check"></i> Accept</button>
+                <button class="btn-reject" onclick="rejectBooking('${b.id}')"><i class="fa-solid fa-xmark"></i> Reject</button>`;
+        } else if (isCompleted) {
+            actionHtml = b.review
+                ? `<span class="order-review-stars" title="Customer rating: ${b.review.rating}/5">${reviewStarsHtml(b.review.rating)}</span>`
+                : `<span class="order-review-note">Not reviewed yet</span>`;
+        }
+
+        return `
+            <div class="order-card">
+                <div class="order-card-top">
+                    <div class="order-card-left">
+                        ${b.packageImage
+                            ? `<img src="${b.packageImage}" alt="${packageName}" class="order-thumb">`
+                            : `<div class="order-thumb-fallback"><i class="fa-solid fa-spa"></i></div>`
+                        }
+                        <div class="order-card-info">
+                            <p class="order-title">${packageName}</p>
+                            <p class="order-id">Order #${b.orderNumber || b.id}</p>
+                            <p class="order-detail-line"><strong>Customer:</strong> ${b.customerName || '—'}</p>
+                            <p class="order-detail-line"><strong>Booked on:</strong> ${formatDate(b.date)}${b.time ? ' · ' + b.time : ''}</p>
+                            <p class="order-detail-line"><strong>Location:</strong> ${b.location || '—'}</p>
+                        </div>
+                    </div>
+                    <div class="order-card-right">
+                        <span class="order-price">₹${(b.amount || 0).toLocaleString('en-IN')}</span>
+                        <span class="order-pill ${statusInfo.cls}">${statusInfo.label}</span>
+                        <span class="order-pill ${pay.cls}">${pay.label}</span>
+                        ${actionHtml ? `<div class="order-card-action">${actionHtml}</div>` : ''}
+                    </div>
+                </div>
+            </div>`;
+    }).join('');
+
+    wrap.innerHTML = `<div class="orders-list">${cards}</div>`;
+}
+
+// Plain 5-star row (filled up to the given rating) — mirrors the
+// customer dashboard's read-only "your review" stars.
+function reviewStarsHtml(rating) {
+    const r = Math.max(0, Math.min(5, Number(rating) || 0));
+    let stars = '';
+    for (let i = 1; i <= 5; i++) {
+        stars += `<i class="fa-solid fa-star" style="color:${i <= r ? '#d97706' : '#e5e7eb'};"></i>`;
+    }
+    return stars;
+}
+
+// Shows the customer's star rating + review comment once a completed
+// booking has been reviewed. Customers write these from their own
+// dashboard (Rate & Review); artists see the result here, read-only.
+function reviewCellHtml(b) {
+    if ((b.status || '').toUpperCase() !== 'COMPLETED') {
+        return `<span class="review-none">—</span>`;
+    }
+    if (!b.review) {
+        return `<span class="review-none">Not reviewed yet</span>`;
+    }
+    const rating = Math.max(0, Math.min(5, Number(b.review.rating) || 0));
+    const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+    const comment = (b.review.comment || '').trim();
+    return `
+        <div class="review-cell">
+            <span class="review-stars" title="${rating}/5">${stars}</span>
+            ${comment ? `<span class="review-comment" title="${comment.replace(/"/g, '&quot;')}">${comment}</span>` : ''}
+        </div>`;
+}
+
+function renderDashboardPending() {
+    const wrap = document.getElementById('dashboardRecentWrap');
+    const pending = allBookings.filter(b => (b.status || '').toUpperCase() === 'PENDING').slice(0, 3);
+
+    if (!pending.length) return; // keep default empty state
+
+    const items = pending.map(b => `
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#fff; border-radius:10px; border:1px solid #e5e7eb; margin-bottom:8px;">
+            <div>
+                <div style="font-weight:700; color:#1f2937; font-size:0.82rem;">#${b.orderNumber || b.id} · ${b.customerName || 'Customer'}</div>
+                <div style="font-size:0.72rem; color:#6b7280;">${b.packageName || b.package || ''} · ${formatDate(b.date)} ${b.time || ''}</div>
+            </div>
+            <div class="action-btns">
+                <button class="btn-accept" onclick="acceptBooking('${b.id}')"><i class="fa-solid fa-check"></i></button>
+                <button class="btn-reject" onclick="rejectBooking('${b.id}')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>`).join('');
+
+    wrap.innerHTML = items;
+}
+
+async function acceptBooking(id) {
+    await updateBookingStatus(id, 'accept', 'ACCEPTED');
+}
+
+async function rejectBooking(id) {
+    if (!confirm('Reject this booking? This cannot be undone.')) return;
+    await updateBookingStatus(id, 'reject', 'CANCELLED');
+}
+
+async function updateBookingStatus(id, action, newStatus) {
+    const buttons = document.querySelectorAll(`button[onclick*="${id}"]`);
+    buttons.forEach(btn => btn.disabled = true);
+
+    try {
+        const response = await fetch(`/api/artist/bookings/${id}/${action}`, {
+            method: 'PUT',
+            headers: authHeaders({ 'Content-Type': 'application/json' })
+        });
+        if (response.status === 401) return handleUnauthorized();
+        const data = await response.json();
+
+        if (data.success) {
+            const booking = allBookings.find(b => String(b.id) === String(id));
+            if (booking) booking.status = newStatus;
+            renderBookings();
+            renderDashboardPending();
+            loadDashboardStats();
+        } else {
+            alert(data.error || 'Could not update this booking. Please try again.');
+            buttons.forEach(btn => btn.disabled = false);
+        }
+    } catch (error) {
+        console.error('❌ Failed to update booking:', error);
+        alert('An error occurred while updating the booking.');
+        buttons.forEach(btn => btn.disabled = false);
+    }
+}
+
+// ========================================
+// PROFILE — GET/PUT /api/artist/profile
+// ========================================
+async function loadProfile() {
+    const wrap = document.getElementById('profileWrap');
+    try {
+        const response = await fetch('/api/artist/profile', { headers: authHeaders() });
+        if (response.status === 401) return handleUnauthorized();
+        const data = await response.json();
+
+        if (data.success && data.profile) {
+            profileData = data.profile;
+            renderProfileForm();
+            const credUsernameEl = document.getElementById('credUsername');
+            if (credUsernameEl) credUsernameEl.value = data.profile.username || '';
+        } else {
+            wrap.innerHTML = `<div class="inline-error">${data.error || 'Failed to load profile.'}</div>`;
+        }
+    } catch (error) {
+        console.error('❌ Failed to load profile:', error);
+        wrap.innerHTML = '<div class="inline-error">Could not load your profile. Please refresh and try again.</div>';
+    }
+}
+
+function renderProfileForm() {
+    const wrap = document.getElementById('profileWrap');
+    const p = profileData || {};
+
+    wrap.innerHTML = `
+        <form class="settings-form" id="profileForm" onsubmit="saveProfile(event)">
+            <div id="profileError" class="inline-error" style="display:none;"></div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="profName" value="${p.name || ''}" />
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="profEmail" value="${p.email || ''}" disabled />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" id="profPhone" value="${p.phone || ''}" />
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" id="profLocation" value="${p.location || ''}" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Specialties / Skills (comma separated)</label>
+                <input type="text" id="profSkills" value="${(p.skills || p.specialties || []).toString ? (Array.isArray(p.skills || p.specialties) ? (p.skills || p.specialties).join(', ') : (p.skills || p.specialties || '')) : ''}" />
+            </div>
+            <div class="form-group">
+                <label>Bio / Experience</label>
+                <textarea id="profBio" rows="4">${p.bio || ''}</textarea>
+            </div>
+            <button type="submit" class="btn-save" id="profileSaveBtn">
+                <i class="fa-solid fa-floppy-disk"></i> Save Changes
+            </button>
+        </form>`;
+}
+
+async function saveProfile(event) {
+    event.preventDefault();
+
+    const errorBox = document.getElementById('profileError');
+    errorBox.style.display = 'none';
+
+    const name = document.getElementById('profName').value.trim();
+    const phone = document.getElementById('profPhone').value.trim();
+    const location = document.getElementById('profLocation').value.trim();
+    const skills = document.getElementById('profSkills').value.trim();
+    const bio = document.getElementById('profBio').value.trim();
+
+    if (!name || name.length < 2) {
+        errorBox.textContent = 'Please enter your full name.';
+        errorBox.style.display = 'block';
+        return;
+    }
+    if (!phone || phone.replace(/\D/g, '').length < 10) {
+        errorBox.textContent = 'Please enter a valid phone number.';
+        errorBox.style.display = 'block';
+        return;
+    }
+
+    const btn = document.getElementById('profileSaveBtn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+    try {
+        const response = await fetch('/api/artist/profile', {
+            method: 'PUT',
+            headers: authHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({
+                name, phone, location, bio,
+                skills: skills.split(',').map(s => s.trim()).filter(Boolean)
+            })
+        });
+        if (response.status === 401) return handleUnauthorized();
+        const data = await response.json();
+
+        if (data.success) {
+            profileData = data.profile || profileData;
+            document.getElementById('artistNameDisplay').textContent = name;
+            document.getElementById('dashboardArtistName').textContent = name.split(' ')[0];
+            document.getElementById('headerName').textContent = name.split(' ')[0];
+
+            const updatedUser = Object.assign({}, artistUser, { name });
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Saved!';
+            setTimeout(() => { btn.innerHTML = originalText; btn.disabled = false; }, 1800);
+        } else {
+            errorBox.textContent = data.error || 'Could not save your profile. Please try again.';
+            errorBox.style.display = 'block';
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    } catch (error) {
+        console.error('❌ Failed to save profile:', error);
+        errorBox.textContent = 'An error occurred. Please check your connection and try again.';
+        errorBox.style.display = 'block';
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+// ========================================
+// LOGIN CREDENTIALS — PUT /api/artist/credentials
+// Lets the artist edit their username and/or reset their own password
+// from their own dashboard, after logging in.
+// ========================================
+async function saveCredentials(event) {
+    event.preventDefault();
+
+    const errorBox = document.getElementById('credentialsError');
+    const successBox = document.getElementById('credentialsSuccess');
+    errorBox.style.display = 'none';
+    successBox.style.display = 'none';
+
+    const username = document.getElementById('credUsername').value.trim();
+    const currentPassword = document.getElementById('credCurrentPassword').value;
+    const newPassword = document.getElementById('credNewPassword').value;
+    const confirmPassword = document.getElementById('credConfirmPassword').value;
+
+    if (!currentPassword) {
+        errorBox.textContent = 'Please enter your current password to confirm changes.';
+        errorBox.style.display = 'block';
+        return;
+    }
+    if (newPassword && newPassword.length < 6) {
+        errorBox.textContent = 'New password must be at least 6 characters.';
+        errorBox.style.display = 'block';
+        return;
+    }
+    if (newPassword && newPassword !== confirmPassword) {
+        errorBox.textContent = 'New password and confirmation do not match.';
+        errorBox.style.display = 'block';
+        return;
+    }
+
+    const btn = document.getElementById('credentialsSaveBtn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating...';
+
+    try {
+        const response = await fetch('/api/artist/credentials', {
+            method: 'PUT',
+            headers: authHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ username, currentPassword, newPassword: newPassword || undefined })
+        });
+        if (response.status === 401) return handleUnauthorized();
+        const data = await response.json();
+
+        if (data.success) {
+            successBox.textContent = data.message || 'Login credentials updated successfully.';
+            successBox.style.display = 'block';
+            document.getElementById('credCurrentPassword').value = '';
+            document.getElementById('credNewPassword').value = '';
+            document.getElementById('credConfirmPassword').value = '';
+            if (data.username) document.getElementById('credUsername').value = data.username;
+        } else {
+            errorBox.textContent = data.error || 'Could not update your credentials. Please try again.';
+            errorBox.style.display = 'block';
+        }
+    } catch (error) {
+        console.error('❌ Failed to update credentials:', error);
+        errorBox.textContent = 'An error occurred. Please check your connection and try again.';
+        errorBox.style.display = 'block';
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
+
+// ========================================
+// EARNINGS — GET /api/artist/earnings
+// ========================================
+async function loadEarnings() {
+    const wrap = document.getElementById('earningsWrap');
+    try {
+        const response = await fetch('/api/artist/earnings', { headers: authHeaders() });
+        if (response.status === 401) return handleUnauthorized();
+        const data = await response.json();
+
+        if (data.success) {
+            renderEarnings(data);
+        } else {
+            wrap.innerHTML = `<div class="inline-error">${data.error || 'Failed to load earnings.'}</div>`;
+        }
+    } catch (error) {
+        console.error('❌ Failed to load earnings:', error);
+        wrap.innerHTML = '<div class="inline-error">Could not load earnings. Please refresh and try again.</div>';
+    }
+}
+
+function renderEarnings(data) {
+    const wrap = document.getElementById('earningsWrap');
+    const affiliate = data.affiliate || {};
+    const history = data.history || [];
+
+    // Use affiliate-card style like customer dashboard
+    const summaryHtml = `
+        <div class="affiliate-card" style="margin-bottom: 18px;">
+            <p class="code-label">Your Referral Code</p>
+            <h3 class="referral-code" style="font-size: 1.4rem; letter-spacing: 2px;">${affiliate.referralCode || 'N/A'}</h3>
+            <p class="referral-note">Share this code with friends and earn rewards!</p>
+        </div>
+
+        <div class="affiliate-stats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
+            <div class="affiliate-stat">
+                <span class="number">${affiliate.totalClicks || 0}</span>
+                <span class="label">Total Clicks</span>
+            </div>
+            <div class="affiliate-stat">
+                <span class="number">${affiliate.totalRegistrations || 0}</span>
+                <span class="label">Registered Users</span>
+            </div>
+            <div class="affiliate-stat">
+                <span class="number">${formatCurrency(affiliate.totalCommission || 0)}</span>
+                <span class="label">Commission Earned</span>
+            </div>
+        </div>
+
+        <div class="section-header" style="margin-top: 20px;">
+            <h3 style="font-size: 0.9rem; font-weight: 700; color: #1f2937; margin: 0;">
+                <i class="fa-regular fa-clock" style="color: #6a1b9a; margin-right: 8px;"></i> 
+                Commission History
+            </h3>
+        </div>`;
+
+    if (!history || history.length === 0) {
+        wrap.innerHTML = summaryHtml + `
+            <div class="empty-state" style="margin-top: 10px; padding: 30px 20px;">
+                <i class="fa-regular fa-receipt" style="font-size: 2rem; color: #cbd5e1; display: block; margin-bottom: 10px;"></i>
+                <h4 style="color: #1f2937; font-size: 0.9rem; margin: 0 0 4px; font-weight: 600;">No commissions yet</h4>
+                <p style="color: #6b7280; font-size: 0.75rem; margin: 0;">Share your referral code to start earning!</p>
+               
+            </div>`;
+        return;
+    }
+
+    const rows = history.map(h => `
+        <tr>
+            <td>${formatDate(h.createdAt)}</td>
+            <td>${h.orderId ? '#' + h.orderId.slice(-6) : '—'}</td>
+            <td>${formatCurrency(h.amount)}</td>
+            <td><span class="badge ${h.status === 'APPROVED' ? 'badge-completed' : h.status === 'PAID' ? 'badge-accepted' : 'badge-pending'}">${h.status || 'PENDING'}</span></td>
+            <td style="font-size: 0.75rem; color: #888;">${h.description || 'Commission'}</td>
+        </tr>`).join('');
+
+    wrap.innerHTML = summaryHtml + `
+        <div class="table-wrapper" style="margin-top: 10px;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Order</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>`;
+}
+function handleUnauthorized() {
+    localStorage.removeItem('user');
+    localStorage.removeItem('userToken');
+    localStorage.removeItem('userRole');
+    window.location.href = '/login';
+}
+</script>
+
+<script src="packages-data.js"></script>
+<script src="cart-favorites.js"></script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+{
+  "buildCommand": "npx prisma generate && npx next build",
+  "installCommand": "npm install --legacy-peer-deps",
+  "framework": "nextjs",
+  "trailingSlash": false,
+  "cleanUrls": true,
+  "outputDirectory": ".next",
+  "images": {
+    "sizes": [
+      16,
+      32,
+      48,
+      64,
+      96,
+      128,
+      256,
+      384,
+      640,
+      750,
+      828,
+      1080,
+      1200,
+      1920,
+      2048,
+      3840
+    ],
+    "formats": [
+      "image/avif",
+      "image/webp"
+    ],
+    "minimumCacheTTL": 31536000,
+    "domains": [],
+    "remotePatterns": [
+      {
+        "protocol": "https",
+        "hostname": "images.unsplash.com"
+      },
+      {
+        "protocol": "https",
+        "hostname": "cdn.prod.website-files.com"
+      }
+    ]
+  },
+  "headers": [
+    {
+      "source": "/(.*)-slider\\.(jpg|jpeg|png|webp|avif)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)\\.(jpg|jpeg|png|webp|avif|svg|gif|ico)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "Accept-CH",
+          "value": "DPR, Viewport-Width, Width"
+        }
+      ]
+    },
+    {
+      "source": "/_next/image(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/_next/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)\\.(css|js)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)\\.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=30"
+        }
+      ]
+    },
+    {
+      "source": "/",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=30"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/blog/:slug",
+      "destination": "/blog/post.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/old-blog/:slug",
+      "destination": "/blog/:slug",
+      "permanent": true
+    }
+  ]
+}

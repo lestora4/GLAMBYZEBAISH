@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light only">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artist Admin Dashboard - Glam by Zebaish</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <!-- Export libraries (client-side PDF & Excel generation) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f7f5fa;
+            color: #1a1a1a;
+        }
+
+        /* ---------- Top bar ---------- */
+        .topbar {
+            background: linear-gradient(135deg, #6a1b9a, #4a148c);
+            color: #fff;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .topbar-title { display: flex; align-items: center; gap: 12px; }
+        .topbar-title img { height: 36px; width: auto; background: transparent; }
+        .topbar-title h1 { font-size: 18px; font-weight: 700; }
+        .topbar-title span { font-size: 12px; opacity: 0.85; display: block; }
+        .logout-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff; padding: 9px 16px; border-radius: 10px;
+            font-size: 13px; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .logout-btn:hover { background: rgba(255,255,255,0.25); }
+        .btn-add-artist {
+            background: #ffffff; color: #4a148c; border: none; border-radius: 10px;
+            padding: 10px 18px; font-size: 13.5px; font-weight: 700; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 7px; transition: all .2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,.12);
+        }
+        .btn-add-artist:hover { background: #f3eefa; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,.18); }
+
+        .topbar-actions-desktop { display: flex; align-items: center; gap: 10px; }
+
+        /* Mobile-only logout icon, sits next to the heading. Hidden on desktop. */
+        .logout-icon-btn {
+            display: none;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff; width: 38px; height: 38px; border-radius: 10px;
+            font-size: 15px; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0; margin-left: auto;
+        }
+        .logout-icon-btn:hover { background: rgba(255,255,255,0.25); }
+
+        /* Mobile-only Add Artist placement in the white content area. Hidden on desktop. */
+        .mobile-add-artist-wrap { display: none; margin-bottom: 16px; }
+        .mobile-add-artist-wrap .btn-add-artist {
+            width: 100%; justify-content: center;
+            background: linear-gradient(135deg,#6a1b9a,#4a148c); color: #fff;
+            box-shadow: 0 4px 16px rgba(106,27,154,0.2);
+        }
+        .mobile-add-artist-wrap .btn-add-artist:hover { background: linear-gradient(135deg,#7b1fb0,#5a1a9e); }
+
+        .wrap { max-width: 1300px; margin: 0 auto; padding: 24px 20px 60px; }
+
+        /* ---------- Stats ---------- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #fff; border-radius: 16px; padding: 18px 20px;
+            box-shadow: 0 4px 16px rgba(106,27,154,0.07);
+            display: flex; align-items: center; gap: 14px;
+        }
+        .stat-icon {
+            width: 46px; height: 46px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: #fff; flex-shrink: 0;
+        }
+        .stat-icon.total { background: linear-gradient(135deg,#6a1b9a,#4a148c); }
+        .stat-icon.pending { background: linear-gradient(135deg,#f59e0b,#d97706); }
+        .stat-icon.approved { background: linear-gradient(135deg,#16a34a,#15803d); }
+        .stat-icon.rejected { background: linear-gradient(135deg,#dc2626,#b91c1c); }
+        .stat-value { font-size: 22px; font-weight: 800; line-height: 1.1; }
+        .stat-label { font-size: 12.5px; color: #888; margin-top: 2px; }
+
+        /* ---------- Filters ---------- */
+        .filters-card {
+            background: #fff; border-radius: 16px; padding: 18px 20px;
+            box-shadow: 0 4px 16px rgba(106,27,154,0.07);
+            margin-bottom: 20px;
+        }
+        .filters-title { font-size: 13px; font-weight: 700; color: #555; margin-bottom: 12px; text-transform: uppercase; letter-spacing: .4px; }
+        .filters-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+        .filter-field { display: flex; flex-direction: column; gap: 6px; }
+        .filter-field label { font-size: 12.5px; font-weight: 600; color: #444; }
+        .filter-field input, .filter-field select {
+            padding: 10px 12px; border: 2px solid #e8e4ec; border-radius: 10px;
+            font-size: 13.5px; outline: none; min-width: 170px; font-family: inherit;
+        }
+        .filter-field input:focus, .filter-field select:focus { border-color: #6a1b9a; }
+        .filter-actions { display: flex; gap: 10px; margin-left: auto; }
+        .btn {
+            border: none; border-radius: 10px; padding: 10px 18px; font-size: 13.5px;
+            font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+            transition: all .2s ease;
+        }
+        .btn-primary { background: linear-gradient(135deg,#6a1b9a,#4a148c); color: #fff; }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(106,27,154,.3); }
+        .btn-ghost { background: #f1edf6; color: #4a148c; }
+        .btn-ghost:hover { background: #e6ddf0; }
+        .btn-pdf { background: #fee2e2; color: #b91c1c; }
+        .btn-pdf:hover { background: #fecaca; }
+        .btn-xlsx { background: #dcfce7; color: #15803d; }
+        .btn-xlsx:hover { background: #bbf7d0; }
+
+        .export-row { display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 14px; flex-wrap: wrap; }
+
+        /* ---------- Table ---------- */
+        .table-card {
+            background: #fff; border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(106,27,154,0.07);
+            overflow: hidden;
+        }
+        .table-scroll { overflow-x: auto; scrollbar-color: #4a148c #e8e1f0; scrollbar-width: thin; }
+        .table-scroll::-webkit-scrollbar { height: 12px; }
+        .table-scroll::-webkit-scrollbar-track { background: #e8e1f0; border-radius: 10px; }
+        .table-scroll::-webkit-scrollbar-thumb { background: linear-gradient(135deg,#6a1b9a,#4a148c); border-radius: 10px; border: 2px solid #e8e1f0; }
+        .table-scroll::-webkit-scrollbar-thumb:hover { background: #3a0f70; }
+        table { width: 100%; border-collapse: collapse; min-width: 980px; }
+        thead th {
+            text-align: left; font-size: 11.5px; text-transform: uppercase; letter-spacing: .4px;
+            font-weight: 700; color: #6a1b9a; background: #faf8fc; padding: 14px 16px; border-bottom: 2px solid #ece2f5;
+            white-space: nowrap;
+        }
+        tbody td { padding: 13px 16px; font-size: 13.5px; border-bottom: 1px solid #f3f0f6; vertical-align: middle; }
+        tbody tr:hover { background: #fbf9fd; }
+        .artist-name-cell { display: flex; align-items: center; gap: 10px; }
+        .avatar {
+            width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
+            background: linear-gradient(135deg,#6a1b9a,#4a148c); color:#fff;
+            display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;
+            flex-shrink: 0;
+        }
+        .name-main { font-weight: 700; }
+        .muted { color: #888; font-size: 12px; }
+        .doc-link { color: #6a1b9a; font-weight: 600; text-decoration: none; font-size: 12.5px; }
+        .doc-link:hover { text-decoration: underline; }
+        .no-doc { color: #bbb; font-size: 12.5px; }
+
+        .badge {
+            padding: 4px 11px; border-radius: 20px; font-size: 11.5px; font-weight: 700;
+            display: inline-block; white-space: nowrap;
+        }
+        .badge-pending { background: #fef3c7; color: #b45309; }
+        .badge-approved { background: #dcfce7; color: #15803d; }
+        .badge-rejected { background: #fee2e2; color: #b91c1c; }
+        .rating-inline { font-size: 12px; font-weight: 700; color: #b45309; margin-left: 6px; white-space: nowrap; }
+
+        .row-actions { display: flex; gap: 8px; }
+        .action-btn {
+            border: none; border-radius: 8px; padding: 7px 12px; font-size: 12px; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+        }
+        .approve-btn { background: #dcfce7; color: #15803d; }
+        .approve-btn:hover { background: #bbf7d0; }
+        .reject-btn { background: #fee2e2; color: #b91c1c; }
+        .reject-btn:hover { background: #fecaca; }
+        .action-btn:disabled { opacity: .45; cursor: not-allowed; }
+        .download-btn { background: #ede4f7; color: #4a148c; white-space: nowrap; }
+        .download-btn:hover { background: #ddccf0; }
+
+        .empty-state, .loading-state {
+            text-align: center; padding: 60px 20px; color: #999;
+        }
+        .empty-state i, .loading-state i { font-size: 34px; margin-bottom: 12px; display: block; color: #cdb8e0; }
+
+        .toast {
+            position: fixed; bottom: 24px; right: 24px; background: #1a1a1a; color: #fff;
+            padding: 13px 20px; border-radius: 12px; font-size: 13.5px; font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0,0,0,.2); z-index: 999; display: none; max-width: 320px;
+        }
+        .toast.show { display: block; }
+        .toast.success { background: #15803d; }
+        .toast.error { background: #b91c1c; }
+
+        /* ---------- Reject modal ---------- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(20,10,30,.45);
+            display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: #fff; border-radius: 18px; padding: 26px; max-width: 420px; width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,.25);
+        }
+        .modal-box h3 { font-size: 17px; margin-bottom: 6px; }
+        .modal-box p { font-size: 13px; color: #888; margin-bottom: 16px; }
+        .modal-box textarea {
+            width: 100%; min-height: 90px; padding: 12px; border: 2px solid #e8e4ec; border-radius: 12px;
+            font-size: 13.5px; font-family: inherit; outline: none; resize: vertical;
+        }
+        .modal-box textarea:focus { border-color: #6a1b9a; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+
+        .modal-box.wide { max-width: 560px; }
+        .modal-box.landscape { max-width: 760px; }
+        .modal-box .form-group { margin-bottom: 14px; }
+        .modal-box .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .modal-box label.field-label { display: block; font-size: 12.5px; font-weight: 600; color: #444; margin-bottom: 6px; }
+        .modal-box input[type="text"], .modal-box input[type="email"], .modal-box input[type="tel"], .modal-box input[type="number"] {
+            width: 100%; padding: 11px 12px; border: 2px solid #e8e4ec; border-radius: 10px;
+            font-size: 13.5px; font-family: inherit; outline: none;
+        }
+        .modal-box input:focus { border-color: #6a1b9a; }
+        .modal-box input[type="file"] {
+            width: 100%; padding: 9px 12px; border: 2px dashed #d9cbe9; border-radius: 10px;
+            font-size: 13px; font-family: inherit; background: #faf8fc; cursor: pointer;
+        }
+        .creds-section { border-top: 1px dashed #e8e4ec; margin-top: 6px; padding-top: 14px; }
+        .creds-section .section-label { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #6a1b9a; margin-bottom: 10px; letter-spacing: .3px; }
+        .check-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555; margin-top: 10px; }
+
+        /* ---------- Wizard steps (landscape Add Artist) ---------- */
+        .wizard-steps { display: flex; align-items: flex-start; margin: 4px 0 22px; }
+        .wizard-step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+        .wizard-step-dot {
+            width: 30px; height: 30px; border-radius: 50%; background: #f1edf6; color: #a293b3;
+            display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 800;
+            transition: all .25s ease;
+        }
+        .wizard-step-label { font-size: 11px; font-weight: 700; color: #a293b3; white-space: nowrap; letter-spacing: .2px; }
+        .wizard-step-item.active .wizard-step-dot { background: linear-gradient(135deg,#6a1b9a,#4a148c); color: #fff; box-shadow: 0 4px 10px rgba(106,27,154,.3); }
+        .wizard-step-item.active .wizard-step-label { color: #4a148c; }
+        .wizard-step-item.done .wizard-step-dot { background: #6a1b9a; color: #fff; }
+        .wizard-step-item.done .wizard-step-label { color: #6a1b9a; }
+        .wizard-step-line { flex: 1; height: 2px; background: #eee3f5; margin: 14px 6px 0; border-radius: 2px; overflow: hidden; }
+        .wizard-step-line.done { background: #6a1b9a; }
+        .wizard-panel { display: none; min-height: 190px; }
+        .wizard-panel.active { display: block; animation: fadeIn .2s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .wizard-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 18px; }
+        .wizard-actions .right-group { display: flex; gap: 10px; }
+        .btn-back { background: #f1edf6; color: #4a148c; visibility: hidden; }
+        .btn-back:hover { background: #e6ddf0; }
+
+        @media (max-width: 640px) {
+            .filters-row { flex-direction: column; align-items: stretch; }
+            .filter-field input { min-width: 0; width: 100%; }
+            .filter-actions { margin-left: 0; }
+
+            .topbar-title { flex: 1; min-width: 0; }
+            .topbar-title h1 { font-size: 16px; }
+            .topbar-actions-desktop { display: none; }
+            .logout-icon-btn { display: flex; }
+            .mobile-add-artist-wrap { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="topbar-title">
+            <img src="/aa.png" alt="Glam by Zebaish">
+            <div>
+                <h1>Artist Registrations</h1>
+                <span>Glam by Zebaish &mdash; Admin Panel</span>
+            </div>
+            <button class="logout-icon-btn" id="logoutBtnMobile" aria-label="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+        <div class="topbar-actions-desktop">
+            <button class="btn-add-artist" id="addArtistBtn"><i class="fa-solid fa-plus"></i> Add Artist</button>
+            <button class="logout-btn" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        </div>
+    </div>
+
+    <div class="wrap">
+
+        <div class="mobile-add-artist-wrap">
+            <button class="btn-add-artist" id="addArtistBtnMobile"><i class="fa-solid fa-plus"></i> Add Artist</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon total"><i class="fa-solid fa-users"></i></div>
+                <div>
+                    <div class="stat-value" id="statTotal">0</div>
+                    <div class="stat-label">Total Artists</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon pending"><i class="fa-solid fa-hourglass-half"></i></div>
+                <div>
+                    <div class="stat-value" id="statPending">0</div>
+                    <div class="stat-label">Pending Review</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon approved"><i class="fa-solid fa-check"></i></div>
+                <div>
+                    <div class="stat-value" id="statApproved">0</div>
+                    <div class="stat-label">Approved</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon rejected"><i class="fa-solid fa-xmark"></i></div>
+                <div>
+                    <div class="stat-value" id="statRejected">0</div>
+                    <div class="stat-label">Rejected</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-card">
+            <div class="filters-title">Filters</div>
+            <div class="filters-row">
+                <div class="filter-field">
+                    <label>Search</label>
+                    <input type="text" id="filterSearch" placeholder="Name, email, location">
+                </div>
+                <div class="filter-field">
+                    <label>Location</label>
+                    <input type="text" id="filterLocation" placeholder="e.g. Hyderabad">
+                </div>
+                <div class="filter-field">
+                    <label>Approval Status</label>
+                    <select id="filterApproval">
+                        <option value="">All Approval Statuses</option>
+                        <option value="pending">Pending Approval</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                <div class="filter-field">
+                    <label>Registered From</label>
+                    <input type="date" id="filterFrom">
+                </div>
+                <div class="filter-field">
+                    <label>Registered To</label>
+                    <input type="date" id="filterTo">
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-ghost" id="clearFiltersBtn"><i class="fa-solid fa-rotate-left"></i> Clear</button>
+                    <button class="btn btn-primary" id="applyFiltersBtn"><i class="fa-solid fa-filter"></i> Apply Filters</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export -->
+        <div class="export-row">
+            <button class="btn btn-pdf" id="exportPdfBtn"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
+            <button class="btn btn-xlsx" id="exportExcelBtn"><i class="fa-solid fa-file-excel"></i> Download Excel</button>
+        </div>
+
+        <!-- Table -->
+        <div class="table-card">
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Location</th>
+                            <th>Specialities</th>
+                            <th>ID Proof</th>
+                            <th>Status</th>
+                            <th>Registered On</th>
+                            <th>Download Details</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="artistsTbody">
+                        <tr><td colspan="10">
+                            <div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i>Loading artists...</div>
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div style="margin-top:28px; padding-top:18px; border-top:1px solid #ece7f2; text-align:center;">
+            <p style="font-size:11.5px; color:#aaa;">© 2026 Glam by Zebaish — All rights reserved.</p>
+        </div>
+
+    </div>
+
+    <!-- Add Artist modal -->
+    <div class="modal-overlay" id="addArtistModal">
+        <div class="modal-box landscape">
+            <h3>Add New Artist</h3>
+            <p>Manually add an artist and set their login credentials.</p>
+
+            <div class="wizard-steps" id="wizardSteps">
+                <div class="wizard-step-item active" data-step="1">
+                    <div class="wizard-step-dot">1</div>
+                    <div class="wizard-step-label">Basic Info</div>
+                </div>
+                <div class="wizard-step-line"></div>
+                <div class="wizard-step-item" data-step="2">
+                    <div class="wizard-step-dot">2</div>
+                    <div class="wizard-step-label">Professional Details</div>
+                </div>
+                <div class="wizard-step-line"></div>
+                <div class="wizard-step-item" data-step="3">
+                    <div class="wizard-step-dot">3</div>
+                    <div class="wizard-step-label">Login Access</div>
+                </div>
+            </div>
+
+            <form id="addArtistForm">
+                <!-- Step 1: Basic Info -->
+                <div class="wizard-panel active" data-panel="1">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="field-label">Full Name</label>
+                            <input type="text" id="naName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="field-label">Email</label>
+                            <input type="email" id="naEmail" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="field-label">Phone</label>
+                            <input type="tel" id="naPhone">
+                        </div>
+                        <div class="form-group">
+                            <label class="field-label">Location</label>
+                            <input type="text" id="naLocation" placeholder="e.g., Hyderabad">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Professional Details -->
+                <div class="wizard-panel" data-panel="2">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="field-label">Experience (years)</label>
+                            <input type="number" min="0" id="naExperience">
+                        </div>
+                        <div class="form-group">
+                            <label class="field-label">Specialities</label>
+                            <input type="text" id="naSkills" placeholder="Bridal, Airbrush, Hairstyling">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="field-label">Details / Bio</label>
+                        <textarea id="naBio" placeholder="Tell us about their experience and style" style="min-height:64px;"></textarea>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="field-label">ID Proof Document</label>
+                        <input type="file" id="naIdProof" accept=".jpg,.jpeg,.png,.pdf">
+                        <div class="muted" style="margin-top:5px;">JPG, PNG or PDF, up to 5MB.</div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Login Access -->
+                <div class="wizard-panel" data-panel="3">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="field-label">Username</label>
+                            <input type="text" id="naUsername" placeholder="Defaults to email">
+                        </div>
+                        <div class="form-group">
+                            <label class="field-label">Password</label>
+                            <input type="text" id="naPassword" required>
+                        </div>
+                    </div>
+                    <label class="check-row">
+                        <input type="checkbox" id="naSendCredentials" checked>
+                        Send these credentials to the artist via email
+                    </label>
+                </div>
+            </form>
+
+            <div class="wizard-actions">
+                <button class="btn btn-back" id="wizardBackBtn" type="button">Back</button>
+                <div class="right-group">
+                    <button class="btn btn-ghost" id="cancelAddArtistBtn" type="button">Cancel</button>
+                    <button class="btn btn-primary" id="wizardNextBtn" type="button">Next</button>
+                    <button class="btn btn-primary" id="submitAddArtistBtn" type="button" style="display:none;"><i class="fa-solid fa-user-plus"></i> Add Artist</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject reason modal -->
+    <div class="modal-overlay" id="rejectModal">
+        <div class="modal-box">
+            <h3>Reject Registration</h3>
+            <p>Optionally add a reason. This will be visible to the artist.</p>
+            <textarea id="rejectReason" placeholder="e.g. ID proof unclear, please re-upload"></textarea>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" id="cancelRejectBtn">Cancel</button>
+                <button class="btn btn-pdf" id="confirmRejectBtn"><i class="fa-solid fa-xmark"></i> Confirm Reject</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const token = localStorage.getItem('artistPanelToken');
+        if (!token) {
+            window.location.href = 'artist-admin-login.html';
+        }
+
+        let currentArtists = [];
+        let pendingRejectId = null;
+
+        function showToast(msg, type) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show' + (type ? ' ' + type : '');
+            setTimeout(() => { t.className = 'toast'; }, 3000);
+        }
+
+        function authHeaders() {
+            return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+        }
+
+        function formatDate(d) {
+            if (!d) return '-';
+            return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function initials(name) {
+            if (!name) return '?';
+            return name.trim().split(/\s+/).slice(0, 2).map(p => p[0].toUpperCase()).join('');
+        }
+
+        function statusInfo(artist) {
+            if (artist.isApproved) return { key: 'approved', label: 'Approved' };
+            if (artist.idProofStatus === 'REJECTED') return { key: 'rejected', label: 'Rejected' };
+            return { key: 'pending', label: 'Pending' };
+        }
+
+        function buildQuery() {
+            const params = new URLSearchParams();
+            const search = document.getElementById('filterSearch').value.trim();
+            const location = document.getElementById('filterLocation').value.trim();
+            const approval = document.getElementById('filterApproval').value;
+            const from = document.getElementById('filterFrom').value;
+            const to = document.getElementById('filterTo').value;
+            if (search) params.set('search', search);
+            if (location) params.set('location', location);
+            if (approval) params.set('status', approval);
+            if (from) params.set('dateFrom', from);
+            if (to) params.set('dateTo', to);
+            return params.toString();
+        }
+
+        async function loadArtists() {
+            const tbody = document.getElementById('artistsTbody');
+            tbody.innerHTML = '<tr><td colspan="10"><div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i>Loading artists...</div></td></tr>';
+
+            try {
+                const qs = buildQuery();
+                const res = await fetch('/api/admin/artists' + (qs ? '?' + qs : ''), { headers: authHeaders() });
+
+                if (res.status === 401) {
+                    localStorage.removeItem('artistPanelToken');
+                    window.location.href = 'artist-admin-login.html';
+                    return;
+                }
+
+                const data = await res.json();
+                if (!data.success) {
+                    tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i>Could not load artists.</div></td></tr>';
+                    return;
+                }
+
+                currentArtists = data.artists || [];
+                renderStats(currentArtists);
+                renderTable(currentArtists);
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i>Something went wrong loading artists.</div></td></tr>';
+            }
+        }
+
+        function renderStats(list) {
+            let pending = 0, approved = 0, rejected = 0;
+            list.forEach(a => {
+                const s = statusInfo(a).key;
+                if (s === 'pending') pending++;
+                else if (s === 'approved') approved++;
+                else if (s === 'rejected') rejected++;
+            });
+            document.getElementById('statTotal').textContent = list.length;
+            document.getElementById('statPending').textContent = pending;
+            document.getElementById('statApproved').textContent = approved;
+            document.getElementById('statRejected').textContent = rejected;
+        }
+
+        function renderTable(list) {
+            const tbody = document.getElementById('artistsTbody');
+
+            if (!list.length) {
+                tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><i class="fa-solid fa-user-slash"></i>No artist registrations match these filters.</div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = list.map(a => {
+                const s = statusInfo(a);
+
+                const doc = a.idProofUrl
+                    ? `<a class="doc-link" href="${a.idProofUrl}" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines"></i> View Doc</a>`
+                    : `<span class="no-doc">Not uploaded</span>`;
+
+                const specialities = (a.skills && a.skills.length) ? a.skills.map(sk => escapeHtml(sk.skill)).join(', ') : '-';
+                // Rating has no column of its own — it only appears next to the status badge once approved
+                const ratingInline = a.isApproved ? ` <span class="rating-inline">⭐ ${a.rating || 0}</span>` : '';
+
+                const approveDisabled = s.key === 'approved' ? 'disabled' : '';
+                const rejectDisabled = s.key === 'rejected' ? 'disabled' : '';
+
+                return `
+                <tr>
+                    <td><div class="name-main">${escapeHtml(a.name || '-')}</div></td>
+                    <td>${escapeHtml(a.email || '-')}</td>
+                    <td>${escapeHtml(a.phone || '-')}</td>
+                    <td>${escapeHtml(a.location || '-')}</td>
+                    <td>${specialities}</td>
+                    <td>${doc}</td>
+                    <td><span class="badge badge-${s.key}">${s.label}</span>${ratingInline}</td>
+                    <td>${formatDate(a.createdAt)}</td>
+                    <td>
+                        <button class="action-btn download-btn" onclick="downloadArtistDetailsPdf('${a.id}')">
+                            <i class="fa-solid fa-file-arrow-down"></i> Download
+                        </button>
+                    </td>
+                    <td>
+                        <div class="row-actions">
+                            <button class="action-btn approve-btn" ${approveDisabled} onclick="approveArtist('${a.id}')">
+                                <i class="fa-solid fa-check"></i> Approve
+                            </button>
+                            <button class="action-btn reject-btn" ${rejectDisabled} onclick="openRejectModal('${a.id}')">
+                                <i class="fa-solid fa-xmark"></i> Reject
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+        }
+        async function approveArtist(id) {
+            try {
+                const res = await fetch('/api/admin/artists/' + id + '/approve', {
+                    method: 'PUT',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ approved: true }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Artist approved successfully', 'success');
+                    loadArtists();
+                } else {
+                    showToast(data.error || 'Could not approve artist', 'error');
+                }
+            } catch (err) {
+                showToast('Something went wrong', 'error');
+            }
+        }
+
+        function openRejectModal(id) {
+            pendingRejectId = id;
+            document.getElementById('rejectReason').value = '';
+            document.getElementById('rejectModal').classList.add('show');
+        }
+        function closeRejectModal() {
+            pendingRejectId = null;
+            document.getElementById('rejectModal').classList.remove('show');
+        }
+
+        async function confirmReject() {
+            if (!pendingRejectId) return;
+            const reason = document.getElementById('rejectReason').value.trim();
+            try {
+                const res = await fetch('/api/admin/artists/' + pendingRejectId + '/approve', {
+                    method: 'PUT',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ approved: false, rejectionReason: reason || undefined }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Artist registration rejected', 'success');
+                    closeRejectModal();
+                    loadArtists();
+                } else {
+                    showToast(data.error || 'Could not reject artist', 'error');
+                }
+            } catch (err) {
+                showToast('Something went wrong', 'error');
+            }
+        }
+
+        // ---------- Exports ----------
+        function exportRows() {
+            return currentArtists.map(a => {
+                const s = statusInfo(a);
+                return {
+                    Name: a.name || '',
+                    Email: a.email || '',
+                    Username: a.username || a.email || '',
+                    Phone: a.phone || '',
+                    Location: a.location || '',
+                    'Experience (yrs)': a.experience != null ? a.experience : '',
+                    Specialities: (a.skills && a.skills.length) ? a.skills.map(sk => sk.skill).join(', ') : '',
+                    Details: a.bio || '',
+                    Rating: a.isApproved ? (a.rating || 0) : 'Pending approval',
+                    'ID Proof': a.idProofUrl || 'Not uploaded',
+                    Status: s.label,
+                    'Registered On': formatDate(a.createdAt),
+                };
+            });
+        }
+
+        function exportPdf() {
+            if (!currentArtists.length) { showToast('No data to export', 'error'); return; }
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape' });
+
+            doc.setFontSize(14);
+            doc.text('Artist Registrations - Glam by Zebaish', 14, 15);
+            doc.setFontSize(9);
+            doc.text('Generated: ' + new Date().toLocaleString('en-IN'), 14, 21);
+
+            const rows = exportRows().map(r => [
+                r.Name, r.Email, r.Username, r.Phone, r.Location, r['Experience (yrs)'],
+                r.Specialities, r.Status, r.Rating, r['Registered On'],
+                r['ID Proof'] === 'Not uploaded' ? 'Not uploaded' : 'Uploaded'
+            ]);
+
+            doc.autoTable({
+                startY: 27,
+                head: [['Name', 'Email', 'Username', 'Phone', 'Location', 'Exp (yrs)', 'Specialities', 'Status', 'Rating', 'Registered On', 'ID Proof']],
+                body: rows,
+                styles: { fontSize: 7.5, cellPadding: 2.5 },
+                headStyles: { fillColor: [106, 27, 154] },
+            });
+
+            doc.save('artist-registrations-' + new Date().toISOString().split('T')[0] + '.pdf');
+        }
+
+        function exportExcel() {
+            if (!currentArtists.length) { showToast('No data to export', 'error'); return; }
+            const rows = exportRows();
+            const ws = XLSX.utils.json_to_sheet(rows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Artists');
+            XLSX.writeFile(wb, 'artist-registrations-' + new Date().toISOString().split('T')[0] + '.xlsx');
+        }
+
+        // ---------- Single artist details PDF ----------
+        function downloadArtistDetailsPdf(id) {
+            const a = currentArtists.find(x => x.id === id);
+            if (!a) { showToast('Artist not found', 'error'); return; }
+
+            const s = statusInfo(a);
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait' });
+            const marginX = 16;
+            let y = 20;
+
+            doc.setFontSize(16);
+            doc.setTextColor(74, 20, 140);
+            doc.text('Artist Details - Glam by Zebaish', marginX, y);
+            y += 6;
+            doc.setDrawColor(200, 185, 220);
+            doc.line(marginX, y, 194, y);
+            y += 10;
+
+            doc.setFontSize(10);
+            doc.setTextColor(120, 120, 120);
+            doc.text('Generated: ' + new Date().toLocaleString('en-IN'), marginX, y);
+            y += 12;
+
+            const field = (label, value) => {
+                doc.setFontSize(10.5);
+                doc.setTextColor(74, 20, 140);
+                doc.text(label, marginX, y);
+                doc.setTextColor(30, 30, 30);
+                const lines = doc.splitTextToSize(String(value || '-'), 130);
+                doc.text(lines, marginX + 45, y);
+                y += Math.max(8, lines.length * 6);
+            };
+
+            const specialities = (a.skills && a.skills.length) ? a.skills.map(sk => sk.skill).join(', ') : '-';
+            const rating = a.isApproved ? (a.rating || 0) : 'Pending approval';
+
+            field('Name:', a.name);
+            field('Email:', a.email);
+            field('Username:', a.username || a.email);
+            field('Phone:', a.phone);
+            field('Location:', a.location);
+            field('Experience:', a.experience != null ? a.experience + ' yrs' : '-');
+            field('Specialities:', specialities);
+            field('Status:', s.label);
+            field('Rating:', rating);
+            field('Registered On:', formatDate(a.createdAt));
+
+            y += 2;
+            doc.setFontSize(10.5);
+            doc.setTextColor(74, 20, 140);
+            doc.text('Details / Bio:', marginX, y);
+            y += 6;
+            doc.setTextColor(30, 30, 30);
+            doc.setFontSize(10);
+            const bioLines = doc.splitTextToSize(a.bio || 'Not provided', 178);
+            doc.text(bioLines, marginX, y);
+            y += bioLines.length * 5.5 + 10;
+
+            doc.setFontSize(10.5);
+            doc.setTextColor(74, 20, 140);
+            doc.text('ID Proof:', marginX, y);
+            if (a.idProofUrl) {
+                doc.setTextColor(37, 99, 235);
+                doc.textWithLink('View ID', marginX + 45, y, { url: a.idProofUrl });
+            } else {
+                doc.setTextColor(150, 150, 150);
+                doc.text('Not uploaded', marginX + 45, y);
+            }
+
+            doc.save((a.name || 'artist').replace(/\s+/g, '-').toLowerCase() + '-details.pdf');
+        }
+
+        // ---------- Add Artist ----------
+        let naCurrentStep = 1;
+        const NA_TOTAL_STEPS = 3;
+
+        function naShowStep(step) {
+            naCurrentStep = step;
+            document.querySelectorAll('.wizard-panel').forEach(p => {
+                p.classList.toggle('active', Number(p.dataset.panel) === step);
+            });
+            document.querySelectorAll('.wizard-step-item').forEach(item => {
+                const n = Number(item.dataset.step);
+                item.classList.toggle('active', n === step);
+                item.classList.toggle('done', n < step);
+            });
+            document.querySelectorAll('.wizard-step-line').forEach((line, idx) => {
+                line.classList.toggle('done', idx + 1 < step);
+            });
+            document.getElementById('wizardBackBtn').style.visibility = step === 1 ? 'hidden' : 'visible';
+            document.getElementById('wizardNextBtn').style.display = step === NA_TOTAL_STEPS ? 'none' : 'inline-flex';
+            document.getElementById('submitAddArtistBtn').style.display = step === NA_TOTAL_STEPS ? 'inline-flex' : 'none';
+        }
+
+        function naValidateStep(step) {
+            if (step === 1) {
+                const name = document.getElementById('naName').value.trim();
+                const email = document.getElementById('naEmail').value.trim();
+                if (!name || !email) { showToast('Name and email are required', 'error'); return false; }
+            }
+            return true;
+        }
+
+        function openAddArtistModal() {
+            document.getElementById('addArtistForm').reset();
+            document.getElementById('naSendCredentials').checked = true;
+            naShowStep(1);
+            document.getElementById('addArtistModal').classList.add('show');
+        }
+        function closeAddArtistModal() {
+            document.getElementById('addArtistModal').classList.remove('show');
+        }
+
+        async function submitAddArtist() {
+            const name = document.getElementById('naName').value.trim();
+            const email = document.getElementById('naEmail').value.trim();
+            const password = document.getElementById('naPassword').value;
+            const idProofFile = document.getElementById('naIdProof').files[0];
+
+            if (!name || !email) { showToast('Name and email are required', 'error'); return; }
+            if (!password || password.length < 6) { showToast('Password must be at least 6 characters', 'error'); return; }
+            if (idProofFile && idProofFile.size > 5 * 1024 * 1024) { showToast('ID proof file must be under 5MB', 'error'); return; }
+
+            const sendCredentials = document.getElementById('naSendCredentials').checked;
+
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('email', email);
+            formData.append('phone', document.getElementById('naPhone').value.trim());
+            formData.append('location', document.getElementById('naLocation').value.trim());
+            formData.append('experience', document.getElementById('naExperience').value);
+            formData.append('bio', document.getElementById('naBio').value.trim());
+            formData.append('specialties', document.getElementById('naSkills').value.trim());
+            formData.append('username', document.getElementById('naUsername').value.trim());
+            formData.append('password', password);
+            formData.append('sendCredentials', sendCredentials);
+            formData.append('status', 'AVAILABLE');
+            if (idProofFile) formData.append('idProof', idProofFile);
+
+            const btn = document.getElementById('submitAddArtistBtn');
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Adding...';
+
+            try {
+                const res = await fetch('/api/admin/artists', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token },
+                    body: formData,
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Artist added successfully!' + (sendCredentials ? ' Credentials emailed.' : ''), 'success');
+                    closeAddArtistModal();
+                    loadArtists();
+                } else {
+                    showToast(data.error || 'Could not add artist', 'error');
+                }
+            } catch (err) {
+                showToast('Something went wrong', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = original;
+            }
+        }
+
+        document.getElementById('addArtistBtn').addEventListener('click', openAddArtistModal);
+        document.getElementById('addArtistBtnMobile').addEventListener('click', openAddArtistModal);
+        document.getElementById('cancelAddArtistBtn').addEventListener('click', closeAddArtistModal);
+        document.getElementById('submitAddArtistBtn').addEventListener('click', submitAddArtist);
+        document.getElementById('wizardNextBtn').addEventListener('click', () => {
+            if (!naValidateStep(naCurrentStep)) return;
+            if (naCurrentStep < NA_TOTAL_STEPS) naShowStep(naCurrentStep + 1);
+        });
+        document.getElementById('wizardBackBtn').addEventListener('click', () => {
+            if (naCurrentStep > 1) naShowStep(naCurrentStep - 1);
+        });
+        document.querySelectorAll('#wizardSteps .wizard-step-item').forEach(item => {
+            item.style.cursor = 'pointer';
+            item.addEventListener('click', () => {
+                const target = Number(item.dataset.step);
+                if (target < naCurrentStep) naShowStep(target);
+            });
+        });
+
+        // ---------- Events ----------
+        document.getElementById('applyFiltersBtn').addEventListener('click', loadArtists);
+        document.getElementById('clearFiltersBtn').addEventListener('click', () => {
+            document.getElementById('filterSearch').value = '';
+            document.getElementById('filterLocation').value = '';
+            document.getElementById('filterApproval').value = '';
+            document.getElementById('filterFrom').value = '';
+            document.getElementById('filterTo').value = '';
+            loadArtists();
+        });
+        document.getElementById('filterSearch').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') loadArtists();
+        });
+        document.getElementById('exportPdfBtn').addEventListener('click', exportPdf);
+        document.getElementById('exportExcelBtn').addEventListener('click', exportExcel);
+        document.getElementById('cancelRejectBtn').addEventListener('click', closeRejectModal);
+        document.getElementById('confirmRejectBtn').addEventListener('click', confirmReject);
+        function doLogout() {
+            localStorage.removeItem('artistPanelToken');
+            localStorage.removeItem('artistPanelAdmin');
+            window.location.href = 'artist-admin-login.html';
+        }
+        document.getElementById('logoutBtn').addEventListener('click', doLogout);
+        document.getElementById('logoutBtnMobile').addEventListener('click', doLogout);
+
+        loadArtists();
+    </script>
+</body>
+</html>

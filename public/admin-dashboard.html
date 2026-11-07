@@ -1,0 +1,2069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1635552701268110');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1635552701268110&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light only">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glam Admin - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <!-- Export libraries (client-side PDF & Excel generation) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        /* ========================================
+           CUSTOM SCROLLBAR
+           (light track/purple thumb for the white main
+           content area — the old dark-on-dark version was
+           barely visible outside the sidebar)
+           ======================================== */
+        html { scrollbar-color: #6a1b9a #e8e1f0; scrollbar-width: thin; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #e8e1f0; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg,#6a1b9a,#4a148c); border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3a0f70; }
+
+        /* Sidebar keeps a dark-themed scrollbar so it matches its own background */
+        .sidebar { scrollbar-color: #6a5b8a #1C2434; }
+        .sidebar ::-webkit-scrollbar-track { background: #1C2434; }
+        .sidebar ::-webkit-scrollbar-thumb { background: #6a5b8a; }
+        .sidebar ::-webkit-scrollbar-thumb:hover { background: #8577a8; }
+
+        /* ========================================
+           WIZARD STEPS (landscape Add Artist modal)
+           ======================================== */
+        .wizard-steps { display: flex; align-items: flex-start; margin: 4px 0 20px; }
+        .wizard-step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; cursor: default; }
+        .wizard-step-dot {
+            width: 30px; height: 30px; border-radius: 50%; background: #f1f0f4; color: #a3a3ad;
+            display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 800;
+            transition: all .25s ease;
+        }
+        .wizard-step-label { font-size: 11px; font-weight: 700; color: #a3a3ad; white-space: nowrap; letter-spacing: .2px; }
+        .wizard-step-item.active .wizard-step-dot { background: linear-gradient(135deg,#9333ea,#6a1b9a); color: #fff; box-shadow: 0 4px 10px rgba(147,51,234,.3); }
+        .wizard-step-item.active .wizard-step-label { color: #7e22ce; }
+        .wizard-step-item.done { cursor: pointer; }
+        .wizard-step-item.done .wizard-step-dot { background: #9333ea; color: #fff; }
+        .wizard-step-item.done .wizard-step-label { color: #9333ea; }
+        .wizard-step-line { flex: 1; height: 2px; background: #ececf1; margin: 14px 6px 0; border-radius: 2px; }
+        .wizard-step-line.done { background: #9333ea; }
+        #artistForm .wizard-panel { display: none !important; min-height: 175px; }
+        #artistForm .wizard-panel.active { display: block !important; animation: wizardFadeIn .2s ease; }
+        /* Overrides the global button[type="submit"] !important rule (see #glam-uniform-design below),
+           which would otherwise force this button visible on every wizard step. */
+        #artistForm #artistWizardSubmitBtn { display: none !important; }
+        #artistForm #artistWizardSubmitBtn.wizard-step-visible { display: inline-flex !important; }
+        @keyframes wizardFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ========================================
+           SIDEBAR TRANSITION
+           ======================================== */
+        .sidebar-transition { transition: transform 0.3s ease-in-out; }
+
+        /* ========================================
+           MOBILE MENU OVERLAY
+           ======================================== */
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+        }
+        .menu-overlay.active { display: block; }
+
+        /* ========================================
+           STATUS BADGES
+           ======================================== */
+        .badge-pending, .badge-assigned, .badge-completed, .badge-cancelled, .badge-in-progress, .badge-accepted, .badge-unpaid, .badge-paid { display:inline-flex; align-items:center; justify-content:center; }
+        .badge-pending { background: #ca8a04; color: #111827; border: 1px solid #a16207; }
+        .badge-assigned { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .badge-completed { background: #15803d; color: #dcfce7; border: 1px solid #166534; }
+        .badge-cancelled { background: #b91c1c; color: #fee2e2; border: 1px solid #991b1b; }
+        .badge-in-progress { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .badge-accepted { background: #15803d; color: #dcfce7; border: 1px solid #166534; }
+        .badge-unpaid { background: #b91c1c; color: #fee2e2; border: 1px solid #991b1b; }
+        .badge-paid { background: #15803d; color: #dcfce7; border: 1px solid #166534; }
+
+        /* ========================================
+           STAT CARD HOVER
+           ======================================== */
+        .stat-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        /* ========================================
+           NAV LINK HOVER & ACTIVE
+           ======================================== */
+        .nav-link {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .nav-link:hover { background: #333A48; }
+        .nav-link.active {
+            background: #333A48;
+            color: white;
+        }
+        .nav-link .badge-count {
+            background: #ef4444;
+            color: white;
+            font-size: 10px;
+            padding: 1px 8px;
+            border-radius: 20px;
+            margin-left: auto;
+        }
+
+        /* ========================================
+           CONTENT SECTIONS
+           ======================================== */
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .content-section.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========================================
+           NOTIFICATION DROPDOWN
+           ======================================== */
+        .notification-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 45px;
+            width: 340px;
+            max-height: 400px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border: 1px solid #e5e7eb;
+            z-index: 100;
+        }
+        .notification-dropdown.open { display: block; }
+        .notification-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+        .notification-item:hover { background: #f9fafb; }
+        .notification-item.unread { background: #f0f0ff; }
+        .notification-item .time { font-size: 11px; color: #9ca3af; }
+
+        /* ========================================
+           LOADING SPINNER
+           ======================================== */
+        .spinner {
+            border: 3px solid #e5e7eb;
+            border-top-color: #6a1b9a;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ========================================
+           RESPONSIVE
+           ======================================== */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                z-index: 50;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+                width: 280px;
+            }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0 !important; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+            .notification-dropdown { width: 300px; right: -50px; }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr !important; }
+            .top-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            .top-header .admin-info { justify-content: space-between; }
+            .search-input { width: 100% !important; }
+            .notification-dropdown { width: 280px; right: -70px; }
+        }
+
+        /* ========================================
+           MODAL STYLES
+           ======================================== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            max-width: 400px;
+        }
+        .toast.success { background: #22c55e; }
+        .toast.error { background: #ef4444; }
+        .toast.info { background: #3b82f6; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+<style id="glam-uniform-design">
+/* Glam by Zebaish unified CTA system */
+button[type="submit"], button.glam-pkg-addcart, .glam-checkout-btn, .capsule-login-btn, .book-now-btn, .hero-slide-btn, .w-button, .button, .btn {
+  background:#460c61 !important;
+  color:#fff !important;
+  border:1px solid #460c61 !important;
+  min-height:48px !important;
+  padding:0 24px !important;
+  border-radius:10px !important;
+  font-size:.82rem !important;
+  font-weight:800 !important;
+  letter-spacing:.7px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:8px !important;
+  box-shadow:0 6px 18px rgba(70,12,97,.16) !important;
+  text-decoration:none !important;
+  transition:all .2s ease !important;
+}
+button[type="submit"]:hover, button.glam-pkg-addcart:hover, .glam-checkout-btn:hover, .capsule-login-btn:hover, .book-now-btn:hover, .hero-slide-btn:hover, .w-button:hover, .button:hover, .btn:hover {
+  background:#5b1478 !important; color:#fff !important; transform:translateY(-1px);
+}
+/* Dark/image sections: clean white CTA with purple label */
+.hero-slide .hero-slide-btn, .dark-section button, .dark-section .button, .dark-section .btn, .footer button, .footer .button, .footer .btn {
+  background:#fff !important; color:#460c61 !important; border-color:#fff !important;
+}
+.hero-slide .hero-slide-btn:hover, .dark-section button:hover, .dark-section .button:hover, .dark-section .btn:hover, .footer button:hover, .footer .button:hover, .footer .btn:hover {
+  background:#f5eef8 !important; color:#460c61 !important;
+}
+/* Auth actions should never be tiny */
+.capsule-login-btn { width:100% !important; min-width:0 !important; height:50px !important; padding:0 28px !important; border-radius:12px !important; font-size:.88rem !important; }
+.signature-glam-slider-title { white-space:nowrap; }
+@media(max-width:600px){.signature-glam-slider-title{font-size:clamp(1.7rem,8vw,2.5rem);white-space:normal;}.capsule-login-btn{height:50px !important;}}
+</style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- ========================================
+    MOBILE MENU OVERLAY
+    ======================================== -->
+    <div class="menu-overlay" id="menuOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- ========================================
+    SIDEBAR - REMOVED PACKAGES
+    ======================================== -->
+    <aside class="sidebar sidebar-transition w-[280px] bg-[#1C2434] text-white flex flex-col fixed left-0 top-0 h-full z-50" id="sidebar">
+        <!-- Brand with Logo -->
+        <div class="p-5 border-b border-[#333A48] flex items-center gap-3">
+            <img src="/aa.png" alt="Glam by Zebaish" class="h-12 w-auto object-contain">
+        </div>
+
+        <!-- Navigation - Packages REMOVED -->
+        <nav class="flex-1 px-4 py-6 overflow-y-auto">
+            <div class="mb-6">
+                <p class="text-xs uppercase text-gray-500 font-semibold px-2 mb-2 tracking-wider">Main Menu</p>
+                
+                <button type="button" class="nav-link active flex items-center gap-3 py-2.5 px-4 rounded-lg text-sm font-medium w-full text-left" data-section="dashboard">
+                    <i class="fa-solid fa-chart-simple w-5 text-center"></i> Dashboard
+                </button>
+                <button type="button" class="nav-link flex items-center gap-3 py-2.5 px-4 rounded-lg text-sm font-medium text-gray-400 w-full text-left" data-section="orders">
+                    <i class="fa-solid fa-receipt w-5 text-center"></i> Orders
+                    <span class="badge-count" id="orderBadge">0</span>
+                </button>
+                <button type="button" class="nav-link flex items-center gap-3 py-2.5 px-4 rounded-lg text-sm font-medium text-gray-400 w-full text-left" data-section="artists">
+                    <i class="fa-solid fa-user-tie w-5 text-center"></i> Artists
+                </button>
+                <button type="button" class="nav-link flex items-center gap-3 py-2.5 px-4 rounded-lg text-sm font-medium text-gray-400 w-full text-left" data-section="customers">
+                    <i class="fa-solid fa-users w-5 text-center"></i> Customers
+                </button>
+                <button type="button" class="nav-link flex items-center gap-3 py-2.5 px-4 rounded-lg text-sm font-medium text-gray-400 w-full text-left" data-section="payments">
+                    <i class="fa-solid fa-credit-card w-5 text-center"></i> Payments
+                </button>
+                <button type="button" class="nav-link flex items-center gap-3 py-2.5 px-4 rounded-lg text-sm font-medium text-gray-400 w-full text-left" data-section="affiliate">
+                    <i class="fa-solid fa-gift w-5 text-center"></i> Affiliate
+                </button>
+                <button type="button" class="nav-link flex items-center gap-3 py-2.5 px-4 rounded-lg text-sm font-medium text-gray-400 w-full text-left" data-section="reviews">
+                    <i class="fa-solid fa-star w-5 text-center"></i> Reviews
+                </button>
+            </div>
+
+            <!-- Logout -->
+            <div class="border-t border-[#333A48] pt-4 mt-2">
+                <button type="button" onclick="logout()" class="nav-link flex items-center gap-3 py-2.5 px-4 rounded-lg text-sm font-medium text-red-400 hover:bg-red-900/20 w-full text-left">
+                    <i class="fa-solid fa-right-from-bracket w-5 text-center"></i> Logout
+                </button>
+            </div>
+        </nav>
+
+        <div class="p-4 border-t border-[#333A48] text-xs text-gray-500 text-center">
+            <p>© 2026 Glam by Zebaish</p>
+        </div>
+    </aside>
+
+    <!-- ========================================
+    MAIN CONTENT
+    ======================================== -->
+    <main class="main-content flex-1 flex flex-col min-h-screen" style="margin-left: 280px;">
+        
+        <!-- TOP HEADER -->
+        <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
+            <div class="flex items-center justify-between px-6 py-3 md:px-8">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="md:hidden text-gray-600 hover:text-gray-900 text-xl">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 class="text-lg font-semibold text-gray-800 hidden sm:block" id="pageTitle">Dashboard</h1>
+                </div>
+
+                <div class="flex items-center gap-4 flex-1 justify-end">
+                    <div class="relative hidden lg:block">
+                        <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                        <input type="search" placeholder="Search..." id="searchInput" class="search-input bg-gray-100 border-none rounded-lg pl-10 pr-4 py-2 text-sm w-56 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white transition" oninput="handleSearch(this.value)"/>
+                    </div>
+
+                    <!-- Notification Bell -->
+                    <div class="relative">
+                        <button onclick="toggleNotifications()" class="relative text-gray-400 hover:text-gray-600 transition">
+                            <i class="fa-regular fa-bell text-xl"></i>
+                            <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center" id="notificationCount">0</span>
+                        </button>
+                        
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="p-3 border-b border-gray-100 font-semibold text-gray-700 text-sm flex items-center justify-between">
+                                <span>Notifications</span>
+                                <button onclick="markAllRead()" class="text-xs text-purple-600 hover:text-purple-700">Mark all read</button>
+                            </div>
+                            <div id="notificationList"></div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 border-l pl-4 border-gray-200">
+                        <div class="text-right hidden sm:block">
+                            <p class="text-sm font-medium text-gray-800" id="adminName">Admin</p>
+                            
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white font-semibold text-sm" id="adminAvatar">A</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto">
+
+            <!-- ========================================
+            SECTION: DASHBOARD - REMOVED PACKAGES STAT
+            ======================================== -->
+            <div class="content-section active" id="section-dashboard">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800">Dashboard</h2>
+                        <p class="text-sm text-gray-500 mt-0.5">Real-time business overview</p>
+                    </div>
+                    <span class="text-xs text-gray-400 bg-gray-100 px-3 py-1.5 rounded-full">
+                        <i class="fa-regular fa-calendar mr-1"></i> <span id="currentDate"></span>
+                    </span>
+                </div>
+
+                <div class="stats-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+                    <div class="stat-card bg-white rounded-xl shadow-sm p-5 border border-gray-100" onclick="switchSection('orders')">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Total Orders</p>
+                                <p class="text-2xl font-bold text-gray-800 mt-1" id="totalOrders">0</p>
+                            </div>
+                            <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
+                                <i class="fa-solid fa-receipt text-purple-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card bg-white rounded-xl shadow-sm p-5 border border-gray-100" onclick="switchSection('orders')">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Pending</p>
+                                <p class="text-2xl font-bold text-gray-800 mt-1" id="pendingOrders">0</p>
+                            </div>
+                            <div class="w-10 h-10 bg-yellow-50 rounded-lg flex items-center justify-center">
+                                <i class="fa-solid fa-clock text-yellow-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Revenue</p>
+                                <p class="text-2xl font-bold text-gray-800 mt-1" id="totalRevenue">₹0</p>
+                            </div>
+                            <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
+                                <i class="fa-solid fa-indian-rupee-sign text-green-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card bg-white rounded-xl shadow-sm p-5 border border-gray-100" onclick="switchSection('customers')">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Customers</p>
+                                <p class="text-2xl font-bold text-gray-800 mt-1" id="totalCustomers">0</p>
+                            </div>
+                            <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                                <i class="fa-solid fa-users text-blue-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card bg-white rounded-xl shadow-sm p-5 border border-gray-100" onclick="switchSection('artists')">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Artists</p>
+                                <p class="text-2xl font-bold text-gray-800 mt-1" id="totalArtists">0</p>
+                            </div>
+                            <div class="w-10 h-10 bg-pink-50 rounded-lg flex items-center justify-center">
+                                <i class="fa-solid fa-user-tie text-pink-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- PACKAGES STAT REMOVED -->
+                </div>
+
+                <!-- Recent Orders -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                        <h3 class="font-semibold text-gray-800">
+                            <i class="fa-regular fa-clock mr-2 text-purple-600"></i> Recent Orders
+                        </h3>
+                        <button type="button" class="text-sm text-purple-600 hover:text-purple-700 font-medium" onclick="switchSection('orders')">View All →</button>
+                    </div>
+                    <div id="ordersTable" class="overflow-x-auto">
+                        <div class="flex items-center justify-center py-12"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================
+            SECTION: ORDERS - WITH PACKAGE FILTER SHOWING NAMES
+            ======================================== -->
+            <div class="content-section" id="section-orders">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800">Orders</h2>
+                        <p class="text-sm text-gray-500 mt-0.5">Manage all customer orders</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="exportOrders()" class="text-xs bg-purple-600 text-white px-3 py-1.5 rounded-lg hover:bg-purple-700">
+                            <i class="fa-solid fa-download mr-1"></i> Export
+                        </button>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between flex-wrap gap-4">
+                        <div class="flex items-center gap-4 flex-wrap">
+                            <select id="statusFilter" onchange="fetchOrders()" class="text-sm border rounded-lg px-3 py-1.5 bg-gray-50">
+                                <option value="">All Status</option>
+                                <option value="PENDING">Pending</option>
+                                <option value="ASSIGNED">Assigned</option>
+                                <option value="ACCEPTED">Accepted</option>
+                                <option value="IN_PROGRESS">In Progress</option>
+                                <option value="COMPLETED">Completed</option>
+                                <option value="CANCELLED">Cancelled</option>
+                            </select>
+                            <select id="packageFilter" onchange="fetchOrders()" class="text-sm border rounded-lg px-3 py-1.5 bg-gray-50">
+                                <option value="">All Packages</option>
+                                <!-- Package names will be loaded dynamically -->
+                            </select>
+                        </div>
+                        <span class="text-sm text-gray-500" id="orderCount">Total: 0 orders</span>
+                    </div>
+                    <div id="ordersTableFull" class="overflow-x-auto">
+                        <div class="flex items-center justify-center py-12"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================
+            SECTION: ARTISTS
+            ======================================== -->
+            <div class="content-section" id="section-artists">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800">Artists</h2>
+                        <p class="text-sm text-gray-500 mt-0.5">Manage your makeup artists</p>
+                    </div>
+                    <button onclick="openArtistModal()" class="text-sm bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                        <i class="fa-solid fa-plus mr-1"></i> Add Artist
+                    </button>
+                </div>
+                
+                <!-- Search, Location, Approval & Date Filters -->
+                <div class="mb-4 flex items-center gap-3 flex-wrap">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass text-purple-600"></i>
+                        <input type="text" id="artistSearchFilter" onkeydown="if(event.key==='Enter')fetchArtists()" placeholder="Search name, email, location" class="text-sm border rounded-lg px-3 py-2 bg-gray-50 min-w-[190px]">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-location-dot text-purple-600"></i>
+                        <select id="locationFilter" onchange="fetchArtists()" class="text-sm border rounded-lg px-3 py-2 bg-gray-50 min-w-[150px]">
+                            <option value="">All Locations</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-check-double text-purple-600"></i>
+                        <select id="approvalFilter" onchange="fetchArtists()" class="text-sm border rounded-lg px-3 py-2 bg-gray-50 min-w-[150px]">
+                            <option value="">All Approval Statuses</option>
+                            <option value="pending">Pending Approval</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs text-gray-500">From</label>
+                        <input type="date" id="artistDateFrom" onchange="fetchArtists()" class="text-sm border rounded-lg px-3 py-2 bg-gray-50">
+                        <label class="text-xs text-gray-500">To</label>
+                        <input type="date" id="artistDateTo" onchange="fetchArtists()" class="text-sm border rounded-lg px-3 py-2 bg-gray-50">
+                    </div>
+                    <button onclick="clearArtistFilters()" class="text-sm bg-gray-100 text-gray-600 px-3 py-2 rounded-lg hover:bg-gray-200">
+                        <i class="fa-solid fa-rotate-left mr-1"></i> Clear
+                    </button>
+                </div>
+
+                <!-- Export -->
+                <div class="mb-4 flex items-center justify-end gap-2">
+                    <button onclick="exportArtistsPdf()" class="text-sm bg-red-50 text-red-700 px-4 py-2 rounded-lg hover:bg-red-100">
+                        <i class="fa-solid fa-file-pdf mr-1"></i> Download PDF
+                    </button>
+                    <button onclick="exportArtistsExcel()" class="text-sm bg-green-50 text-green-700 px-4 py-2 rounded-lg hover:bg-green-100">
+                        <i class="fa-solid fa-file-excel mr-1"></i> Download Excel
+                    </button>
+                </div>
+
+                <div id="artistList" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
+                    <div class="flex items-center justify-center py-12"><div class="spinner"></div></div>
+                </div>
+            </div>
+
+            <!-- ========================================
+            SECTION: CUSTOMERS
+            ======================================== -->
+            <div class="content-section" id="section-customers">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800">Customers</h2>
+                        <p class="text-sm text-gray-500 mt-0.5">Manage your customers</p>
+                    </div>
+                </div>
+                <div id="customerList" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="flex items-center justify-center py-12"><div class="spinner"></div></div>
+                </div>
+            </div>
+
+            <!-- ========================================
+            SECTION: PAYMENTS
+            ======================================== -->
+            <div class="content-section" id="section-payments">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800">Payments</h2>
+                        <p class="text-sm text-gray-500 mt-0.5">Track all payments</p>
+                    </div>
+                </div>
+                <div id="paymentList" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="flex items-center justify-center py-12"><div class="spinner"></div></div>
+                </div>
+            </div>
+
+            <!-- ========================================
+            SECTION: AFFILIATE
+            ======================================== -->
+            <div class="content-section" id="section-affiliate">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800">Affiliate Program</h2>
+                        <p class="text-sm text-gray-500 mt-0.5">Manage affiliate commissions</p>
+                    </div>
+                    <button onclick="updateCommission()" class="text-sm bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                        <i class="fa-solid fa-percent mr-1"></i> Update Commission
+                    </button>
+                </div>
+                <div id="affiliateStats" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+                        <p class="text-xs text-gray-400">Total Commissions</p>
+                        <p class="text-2xl font-bold text-gray-800" id="totalCommission">₹0</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+                        <p class="text-xs text-gray-400">Pending</p>
+                        <p class="text-2xl font-bold text-yellow-600" id="pendingCommission">₹0</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+                        <p class="text-xs text-gray-400">Approved</p>
+                        <p class="text-2xl font-bold text-green-600" id="approvedCommission">₹0</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+                        <p class="text-xs text-gray-400">Total Clicks</p>
+                        <p class="text-2xl font-bold text-blue-600" id="totalClicks">0</p>
+                    </div>
+                </div>
+                <div id="affiliatesByType" class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="px-6 py-3.5 border-b border-gray-100">
+                            <h3 class="text-sm font-semibold text-gray-700">Customer Referral Codes</h3>
+                        </div>
+                        <div id="customerAffiliateList"><div class="flex items-center justify-center py-8"><div class="spinner"></div></div></div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="px-6 py-3.5 border-b border-gray-100">
+                            <h3 class="text-sm font-semibold text-gray-700">Artist Referral Codes</h3>
+                        </div>
+                        <div id="artistAffiliateList"><div class="flex items-center justify-center py-8"><div class="spinner"></div></div></div>
+                    </div>
+                </div>
+                <div id="affiliateList" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="flex items-center justify-center py-12"><div class="spinner"></div></div>
+                </div>
+            </div>
+
+            <!-- ========================================
+            SECTION: REVIEWS
+            ======================================== -->
+            <div class="content-section" id="section-reviews">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800">Reviews</h2>
+                        <p class="text-sm text-gray-500 mt-0.5">Customer reviews & ratings</p>
+                    </div>
+                </div>
+                <div id="reviewList" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="flex items-center justify-center py-12"><div class="spinner"></div></div>
+                </div>
+            </div>
+
+            <div class="mt-6 flex flex-col items-center justify-center gap-2 text-center text-xs text-gray-400 border-t border-gray-100 pt-4">
+                <p>© 2026 Glam by Zebaish — All rights reserved.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- ========================================
+    MODALS
+    ======================================== -->
+
+    <!-- Artist Modal -->
+    <div class="modal-overlay" id="artistModal">
+        <div class="modal-content" style="max-width: 720px; max-height: none; overflow: visible; padding: 26px;">
+            <h3 class="text-xl font-bold text-gray-800 mb-1">Add New Artist</h3>
+            <p class="text-sm text-gray-400 mb-1">Manually add an artist and set their login credentials.</p>
+
+            <div class="wizard-steps" id="artistWizardSteps">
+                <div class="wizard-step-item active" data-step="1" onclick="artistWizardGoToStep(1)">
+                    <div class="wizard-step-dot">1</div>
+                    <div class="wizard-step-label">Basic Info</div>
+                </div>
+                <div class="wizard-step-line"></div>
+                <div class="wizard-step-item" data-step="2" onclick="artistWizardGoToStep(2)">
+                    <div class="wizard-step-dot">2</div>
+                    <div class="wizard-step-label">Professional Details</div>
+                </div>
+                <div class="wizard-step-line"></div>
+                <div class="wizard-step-item" data-step="3" onclick="artistWizardGoToStep(3)">
+                    <div class="wizard-step-dot">3</div>
+                    <div class="wizard-step-label">Login Access</div>
+                </div>
+            </div>
+
+            <form id="artistForm" onsubmit="saveArtist(event)">
+                <!-- Step 1: Basic Info -->
+                <div class="wizard-panel active" data-panel="1">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Full Name</label>
+                            <input type="text" id="artistName" required class="w-full px-3.5 py-2.5 text-sm border-2 border-gray-200 rounded-lg outline-none transition-colors focus:border-purple-600">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
+                            <input type="email" id="artistEmail" required class="w-full px-3.5 py-2.5 text-sm border-2 border-gray-200 rounded-lg outline-none transition-colors focus:border-purple-600">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Phone</label>
+                            <input type="tel" id="artistPhone" class="w-full px-3.5 py-2.5 text-sm border-2 border-gray-200 rounded-lg outline-none transition-colors focus:border-purple-600">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Location</label>
+                            <input type="text" id="artistLocation" placeholder="e.g., Hyderabad" class="w-full px-3.5 py-2.5 text-sm border-2 border-gray-200 rounded-lg outline-none transition-colors focus:border-purple-600">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Professional Details -->
+                <div class="wizard-panel" data-panel="2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Experience (years)</label>
+                            <input type="number" min="0" id="artistExperience" class="w-full px-3.5 py-2.5 text-sm border-2 border-gray-200 rounded-lg outline-none transition-colors focus:border-purple-600">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Specialities</label>
+                            <input type="text" id="artistSkills" placeholder="Bridal, Airbrush, Hairstyling" class="w-full px-3.5 py-2.5 text-sm border-2 border-gray-200 rounded-lg outline-none transition-colors focus:border-purple-600">
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Details / Bio</label>
+                        <textarea id="artistBio" rows="2" placeholder="Tell us about their experience and style" class="w-full px-3.5 py-2.5 text-sm border-2 border-gray-200 rounded-lg outline-none transition-colors focus:border-purple-600 resize-y"></textarea>
+                    </div>
+                    <div class="mt-3">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">ID Proof Document</label>
+                        <input type="file" id="artistIdProof" accept=".jpg,.jpeg,.png,.pdf" class="w-full px-3.5 py-2.5 text-sm border-2 border-dashed border-purple-200 rounded-lg bg-purple-50/40 cursor-pointer">
+                        <p class="text-xs text-gray-400 mt-1.5">JPG, PNG or PDF, up to 5MB.</p>
+                    </div>
+                </div>
+
+                <!-- Step 3: Login Access -->
+                <div class="wizard-panel" data-panel="3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Username</label>
+                            <input type="text" id="artistUsername" placeholder="Defaults to email" class="w-full px-3.5 py-2.5 text-sm border-2 border-gray-200 rounded-lg outline-none transition-colors focus:border-purple-600">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
+                            <input type="text" id="artistPassword" required class="w-full px-3.5 py-2.5 text-sm border-2 border-gray-200 rounded-lg outline-none transition-colors focus:border-purple-600">
+                        </div>
+                    </div>
+                    <label class="flex items-center gap-2 mt-3.5 text-sm text-gray-600">
+                        <input type="checkbox" id="artistSendCredentials" checked class="rounded text-purple-600 focus:ring-purple-500">
+                        Send these credentials to the artist via email
+                    </label>
+                </div>
+
+                <div class="flex items-center justify-between gap-3 mt-5 pt-4 border-t border-gray-100">
+                    <button type="button" id="artistWizardBackBtn" onclick="artistWizardPrevStep()" style="visibility:hidden;" class="px-5 py-2.5 text-sm font-semibold text-purple-700 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">Back</button>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="closeModal('artistModal')" class="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">Cancel</button>
+                        <button type="button" id="artistWizardNextBtn" onclick="artistWizardNextStep()" class="px-5 py-2.5 text-sm font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 shadow-sm transition-colors">Next</button>
+                        <button type="submit" id="artistWizardSubmitBtn" style="display:none;" class="px-5 py-2.5 text-sm font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 shadow-sm transition-colors inline-flex items-center gap-2"><i class="fa-solid fa-user-plus"></i> Add Artist</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Order Detail Modal -->
+    <div class="modal-overlay" id="orderDetailModal">
+        <div class="modal-content max-w-2xl">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Order Details</h3>
+            <div id="orderDetailContent"></div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeModal('orderDetailModal')" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assign Artist Modal -->
+    <div class="modal-overlay" id="assignArtistModal">
+        <div class="modal-content max-w-2xl">
+            <h3 class="text-xl font-bold text-gray-800 mb-1">Select an Artist</h3>
+            <p id="assignArtistSubtitle" class="text-sm text-gray-500 mb-4"></p>
+            <div id="assignArtistList" class="space-y-2" style="max-height: 420px; overflow-y: auto;"></div>
+            <div class="flex gap-3 mt-6">
+                <button type="button" onclick="closeModal('assignArtistModal')" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <!-- ========================================
+    JAVASCRIPT
+    ======================================== -->
+    <script>
+        // ========================================
+        // AUTH CHECK
+        // ========================================
+        function checkAuth() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                window.location.href = '/admin-login';
+                return false;
+            }
+            return true;
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminData');
+                window.location.href = '/admin-login';
+            }
+        }
+
+        function loadAdminData() {
+            const adminData = localStorage.getItem('adminData');
+            if (adminData) {
+                try {
+                    const data = JSON.parse(adminData);
+                    document.getElementById('adminName').textContent = data.name || 'Admin';
+                    document.getElementById('adminRole').textContent = data.role || 'Super Admin';
+                    document.getElementById('adminAvatar').textContent = (data.name || 'A')[0].toUpperCase();
+                } catch (e) {}
+            }
+        }
+
+        // ========================================
+        // API HELPER
+        // ========================================
+        async function apiCall(endpoint, options = {}) {
+            const token = localStorage.getItem('adminToken');
+            const response = await fetch(endpoint, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    ...options.headers,
+                },
+            });
+            if (response.status === 401) {
+                logout();
+                throw new Error('Unauthorized');
+            }
+            return response.json();
+        }
+
+        // ========================================
+        // TOAST NOTIFICATIONS
+        // ========================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // ========================================
+        // MODALS
+        // ========================================
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // ========================================
+        // NOTIFICATIONS
+        // ========================================
+        let notifications = [];
+        let unreadCount = 0;
+
+        async function fetchNotifications() {
+            try {
+                const data = await apiCall('/api/admin/notifications');
+                if (data.success) {
+                    notifications = data.notifications || [];
+                    unreadCount = notifications.filter(n => !n.read).length;
+                    document.getElementById('notificationCount').textContent = unreadCount;
+                    renderNotifications();
+                }
+            } catch (e) {}
+        }
+
+        function renderNotifications() {
+            const container = document.getElementById('notificationList');
+            if (!notifications || notifications.length === 0) {
+                container.innerHTML = `
+                    <div class="p-6 text-center text-gray-400 text-sm">
+                        <i class="fa-regular fa-bell-slash text-2xl block mb-2"></i>
+                        No notifications
+                    </div>
+                `;
+                return;
+            }
+            let html = '';
+            notifications.slice(0, 10).forEach(n => {
+                html += `
+                    <div class="notification-item ${n.read ? '' : 'unread'}" onclick="markRead('${n.id}')">
+                        <div class="flex items-start gap-2">
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-800">${n.title}</p>
+                                <p class="text-xs text-gray-500">${n.message}</p>
+                                <p class="text-xs text-gray-400 mt-1">${n.time || 'Just now'}</p>
+                            </div>
+                            ${!n.read ? '<span class="w-2 h-2 bg-purple-600 rounded-full mt-1 flex-shrink-0"></span>' : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function toggleNotifications() {
+            const dropdown = document.getElementById('notificationDropdown');
+            dropdown.classList.toggle('open');
+            if (dropdown.classList.contains('open')) {
+                fetchNotifications();
+            }
+        }
+
+        async function markRead(id) {
+            try {
+                await apiCall(`/api/admin/notifications/${id}/read`, { method: 'PUT' });
+                fetchNotifications();
+            } catch (e) {}
+        }
+
+        async function markAllRead() {
+            try {
+                await apiCall('/api/admin/notifications/read-all', { method: 'PUT' });
+                fetchNotifications();
+            } catch (e) {}
+        }
+
+        // ========================================
+        // SECTION SWITCHER
+        // ========================================
+        function switchSection(sectionId) {
+            console.log('🔀 Switching to section:', sectionId);
+            
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            const target = document.getElementById('section-' + sectionId);
+            if (target) {
+                target.classList.add('active');
+                console.log('✅ Section activated:', sectionId);
+            } else {
+                console.error('❌ Section not found:', sectionId);
+            }
+
+            document.querySelectorAll('.nav-link').forEach(el => {
+                el.classList.remove('active');
+                el.classList.add('text-gray-400');
+                if (el.dataset.section === sectionId) {
+                    el.classList.add('active');
+                    el.classList.remove('text-gray-400');
+                }
+            });
+
+            const titles = {
+                'dashboard': 'Dashboard',
+                'orders': 'Orders',
+                'artists': 'Artists',
+                'customers': 'Customers',
+                'payments': 'Payments',
+                'affiliate': 'Affiliate',
+                'reviews': 'Reviews'
+            };
+            document.getElementById('pageTitle').textContent = titles[sectionId] || 'Dashboard';
+
+            if (window.innerWidth <= 768) toggleSidebar();
+
+            switch(sectionId) {
+                case 'dashboard': fetchDashboard(); break;
+                case 'orders': fetchOrders(); break;
+                case 'artists': fetchArtists(); break;
+                case 'customers': fetchCustomers(); break;
+                case 'payments': fetchPayments(); break;
+                case 'affiliate': fetchAffiliate(); break;
+                case 'reviews': fetchReviews(); break;
+                default: console.log('⚠️ No fetch function for section:', sectionId);
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('menuOverlay').classList.toggle('active');
+        }
+
+        // ========================================
+        // DASHBOARD
+        // ========================================
+        async function fetchDashboard() {
+            try {
+                const data = await apiCall('/api/admin/dashboard');
+                if (data.success) {
+                    document.getElementById('totalOrders').textContent = data.stats.totalOrders || 0;
+                    document.getElementById('pendingOrders').textContent = data.stats.pendingOrders || 0;
+                    document.getElementById('totalRevenue').textContent = `₹${(data.stats.totalRevenue || 0).toLocaleString()}`;
+                    document.getElementById('totalCustomers').textContent = data.stats.totalCustomers || 0;
+                    document.getElementById('totalArtists').textContent = data.stats.totalArtists || 0;
+                    // totalPackages removed
+                    document.getElementById('orderBadge').textContent = data.stats.pendingOrders || 0;
+                    document.getElementById('orderCount').textContent = `Total: ${data.stats.totalOrders || 0} orders`;
+
+                    renderOrders(data.recentOrders || [], 'ordersTable');
+                }
+            } catch (e) {
+                document.getElementById('ordersTable').innerHTML = `
+                    <div class="py-12 text-center text-gray-400">
+                        <i class="fa-regular fa-circle-exclamation text-3xl block mb-3"></i>
+                        <p class="text-sm">Failed to load orders</p>
+                        <button onclick="fetchDashboard()" class="mt-3 text-sm text-purple-600 hover:text-purple-700 font-medium">Try Again →</button>
+                    </div>
+                `;
+            }
+        }
+
+        // ========================================
+        // ORDERS
+        // ========================================
+        async function fetchOrders() {
+            const status = document.getElementById('statusFilter').value;
+            const packageId = document.getElementById('packageFilter').value;
+            let url = '/api/admin/orders?';
+            if (status) url += `status=${status}&`;
+            if (packageId) url += `packageId=${packageId}&`;
+
+            try {
+                const data = await apiCall(url);
+                if (data.success) {
+                    document.getElementById('orderCount').textContent = `Total: ${data.orders?.length || 0} orders`;
+                    renderOrders(data.orders || [], 'ordersTableFull');
+                }
+            } catch (e) {
+                document.getElementById('ordersTableFull').innerHTML = `
+                    <div class="py-12 text-center text-gray-400">
+                        <i class="fa-regular fa-circle-exclamation text-3xl block mb-3"></i>
+                        <p class="text-sm">Failed to load orders</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderOrders(orders, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            if (!orders || orders.length === 0) {
+                container.innerHTML = `
+                    <div class="py-12 text-center text-gray-400">
+                        <i class="fa-regular fa-receipt text-3xl block mb-3"></i>
+                        <p class="text-sm">No orders yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const statusMap = {
+                'PENDING': 'badge-pending',
+                'ASSIGNED': 'badge-assigned',
+                'ACCEPTED': 'badge-accepted',
+                'IN_PROGRESS': 'badge-in-progress',
+                'COMPLETED': 'badge-completed',
+                'CANCELLED': 'badge-cancelled',
+            };
+
+            const statusLabels = {
+                'PENDING': 'Pending',
+                'ASSIGNED': 'Assigned',
+                'ACCEPTED': 'Accepted',
+                'IN_PROGRESS': 'In Progress',
+                'COMPLETED': 'Completed',
+                'CANCELLED': 'Cancelled',
+            };
+
+            // Booking status (order.status) and payment status (order.paymentStatus)
+            // are two different, independent fields — a fully PAID order can still
+            // legitimately show booking status "Pending" until an artist is assigned.
+            // They're shown as separate columns below so that's not mistaken for a bug.
+            const paymentStatusClass = {
+                'PENDING': 'badge-unpaid',
+                'PAID': 'badge-paid',
+                'FAILED': 'badge-unpaid',
+                'REFUNDED': 'badge-assigned',
+            };
+            const paymentStatusLabels = {
+                'PENDING': 'Unpaid',
+                'PAID': 'Paid',
+                'FAILED': 'Failed — Unpaid',
+                'REFUNDED': 'Refunded',
+            };
+
+            let html = `
+                <table class="w-full min-w-[600px]">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">Order #</th>
+                            <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">Customer</th>
+                            <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">Package(s)</th>
+                            <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">Amount</th>
+                            <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">Payment Status</th>
+                            <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">Booking Status</th>
+                            <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">Date</th>
+                            <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+            `;
+
+            // ========================================
+            // ONE ROW PER PACKAGE
+            // A combined checkout creates one Order per package. Each is
+            // shown as its own independent row with its own order #,
+            // package, and amount — no grouping/merging across packages.
+            // ========================================
+            orders.forEach(o => {
+                const statusClass = statusMap[o.status] || 'badge-pending';
+                const statusLabel = statusLabels[o.status] || o.status;
+                const payClass = paymentStatusClass[o.paymentStatus] || 'badge-pending';
+                const payLabel = paymentStatusLabels[o.paymentStatus] || o.paymentStatus || 'N/A';
+                const date = o.createdAt ? new Date(o.createdAt).toLocaleDateString() : 'N/A';
+                const actionsHtml = `<button onclick="viewOrder('${o.id}')" class="text-blue-600 hover:text-blue-800 text-sm font-medium">View</button>` +
+                    (o.status === 'PENDING' ? ` <button onclick="assignArtist('${o.id}')" class="text-blue-600 hover:text-blue-800 text-sm font-medium ml-1">Assign</button>` : '');
+
+                html += `
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-3.5 text-sm font-medium text-gray-700">#${o.orderNumber || 'N/A'}</td>
+                        <td class="px-6 py-3.5 text-sm text-gray-600" onclick="viewOrder('${o.id}')" style="cursor:pointer">${o.customer?.name || 'Guest'}</td>
+                        <td class="px-6 py-3.5 text-sm text-gray-600">${o.package?.name || '-'}</td>
+                        <td class="px-6 py-3.5 text-sm font-semibold text-gray-700">₹${(o.totalAmount || 0).toLocaleString()}</td>
+                        <td class="px-6 py-3.5"><span class="inline-block px-3 py-1 rounded-full text-xs font-semibold ${payClass}">${payLabel}</span></td>
+                        <td class="px-6 py-3.5">
+                            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold ${statusClass}">${statusLabel}</span>
+                        </td>
+                        <td class="px-6 py-3.5 text-sm text-gray-500">${date}</td>
+                        <td class="px-6 py-3.5">
+                            ${actionsHtml}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        // ========================================
+        // ORDER DETAILS
+        // ========================================
+        async function viewOrder(orderId) {
+            try {
+                const data = await apiCall(`/api/admin/orders/${orderId}`);
+                if (data.success) {
+                    const order = data.order;
+                    const container = document.getElementById('orderDetailContent');
+                    container.innerHTML = `
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><strong>Order #:</strong> ${order.orderNumber}</div>
+                                <div><strong>Booking Status:</strong> ${order.status}</div>
+                                <div><strong>Customer:</strong> ${order.customer?.name || 'Guest'}</div>
+                                <div><strong>Email:</strong> ${order.customer?.email || 'N/A'}</div>
+                                <div><strong>Package:</strong> ${order.package?.name || '-'}</div>
+                                <div><strong>Amount:</strong> ₹${(order.totalAmount || 0).toLocaleString()}</div>
+                                <div><strong>Date:</strong> ${order.date ? new Date(order.date).toLocaleDateString() : 'N/A'}</div>
+                                <div><strong>Time:</strong> ${order.time || 'N/A'}</div>
+                                <div style="grid-column: 1 / -1;"><strong>Address:</strong> ${order.location || 'N/A'}</div>
+                                <div><strong>Payment Status:</strong> ${order.paymentStatus || 'N/A'}</div>
+                            </div>
+                            ${order.specialNotes ? `<div><strong>Notes:</strong> ${order.specialNotes}</div>` : ''}
+                            ${order.artist ? `<div><strong>Artist:</strong> ${order.artist.name}</div>` : '<div class="text-yellow-600">No artist assigned yet</div>'}
+                            ${order.status === 'PENDING' ? `<button onclick="assignArtist('${order.id}')" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">Assign Artist</button>` : ''}
+                            ${order.status === 'COMPLETED' ? `<div class="text-green-600">✅ Service Completed</div>` : ''}
+                        </div>
+                    `;
+                    openModal('orderDetailModal');
+                }
+            } catch (e) {
+                showToast('Failed to load order details', 'error');
+            }
+        }
+
+        // ========================================
+        // ASSIGN ARTIST
+        // ========================================
+        // Admin picks the artist manually — this loads approved, available
+        // artists for the order, ranked by location and skill match against
+        // the booking, and lets the admin choose instead of auto-assigning.
+        async function assignArtist(orderId) {
+            try {
+                const data = await apiCall(`/api/admin/orders/${orderId}/eligible-artists`);
+                if (!data.success) {
+                    showToast(data.error || 'Failed to load artists', 'error');
+                    return;
+                }
+                if (!data.artists.length) {
+                    showToast('No approved, available artists to assign. Approve or free up an artist first.', 'error');
+                    return;
+                }
+
+                document.getElementById('assignArtistSubtitle').textContent =
+                    `Order ${data.order.orderNumber} — ${data.order.packageName || ''} in ${data.order.location || 'N/A'}. Best matches (by location & skill) are shown first.`;
+
+                const listEl = document.getElementById('assignArtistList');
+                listEl.innerHTML = data.artists.map(a => `
+                    <div class="border rounded-lg p-3 flex items-start justify-between gap-3 ${a.locationMatch || a.skillMatch ? 'border-purple-300 bg-purple-50' : 'border-gray-200'}">
+                        <div>
+                            <div class="font-semibold text-gray-800">${a.name}
+                                ${a.locationMatch ? '<span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">📍 Location match</span>' : ''}
+                                ${a.skillMatch ? '<span class="ml-1 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">✓ Skill match</span>' : ''}
+                            </div>
+                            <div class="text-sm text-gray-500">${a.location || 'Location not set'} • ${a.experience || 0} yrs exp • ⭐ ${(a.rating || 0).toFixed(1)} (${a.totalReviews || 0})</div>
+                            <div class="text-xs text-gray-400 mt-1">${(a.skills || []).join(', ') || 'No skills listed'}</div>
+                        </div>
+                        <button onclick="confirmAssignArtist('${orderId}', '${a.id}', '${a.name.replace(/'/g, "\\'")}')" class="shrink-0 bg-purple-600 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-purple-700">Select</button>
+                    </div>
+                `).join('');
+
+                openModal('assignArtistModal');
+            } catch (e) {
+                showToast('Failed to load artists', 'error');
+            }
+        }
+
+        async function confirmAssignArtist(orderId, artistId, artistName) {
+            try {
+                const result = await apiCall(`/api/admin/orders/${orderId}/assign`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ artistId })
+                });
+
+                if (result.success) {
+                    closeModal('assignArtistModal');
+                    showToast(`${artistName} assigned successfully!`);
+                    fetchOrders();
+                    fetchDashboard();
+                } else {
+                    showToast(result.error || 'Failed to assign artist', 'error');
+                }
+            } catch (e) {
+                showToast('Failed to assign artist', 'error');
+            }
+        }
+
+        // ========================================
+        // ARTISTS
+        // ========================================
+        let currentArtistsList = [];
+
+        // ---------- Add Artist wizard ----------
+        let artistWizardStep = 1;
+        const ARTIST_WIZARD_STEPS = 3;
+
+        function artistWizardShowStep(step) {
+            artistWizardStep = step;
+            document.querySelectorAll('#artistForm .wizard-panel').forEach(p => {
+                const isActive = Number(p.dataset.panel) === step;
+                p.classList.toggle('active', isActive);
+                p.style.display = isActive ? 'block' : 'none';
+            });
+            document.querySelectorAll('#artistWizardSteps .wizard-step-item').forEach(item => {
+                const n = Number(item.dataset.step);
+                item.classList.toggle('active', n === step);
+                item.classList.toggle('done', n < step);
+            });
+            document.querySelectorAll('#artistWizardSteps .wizard-step-line').forEach((line, idx) => {
+                line.classList.toggle('done', idx + 1 < step);
+            });
+            document.getElementById('artistWizardBackBtn').style.visibility = step === 1 ? 'hidden' : 'visible';
+            document.getElementById('artistWizardNextBtn').style.display = step === ARTIST_WIZARD_STEPS ? 'none' : 'inline-flex';
+            document.getElementById('artistWizardSubmitBtn').style.display = step === ARTIST_WIZARD_STEPS ? 'inline-flex' : 'none';
+            document.getElementById('artistWizardSubmitBtn').classList.toggle('wizard-step-visible', step === ARTIST_WIZARD_STEPS);
+        }
+
+        function artistWizardValidateStep(step) {
+            if (step === 1) {
+                const name = document.getElementById('artistName').value.trim();
+                const email = document.getElementById('artistEmail').value.trim();
+                if (!name || !email) { showToast('Full name and email are required', 'error'); return false; }
+            }
+            return true;
+        }
+
+        function artistWizardNextStep() {
+            if (!artistWizardValidateStep(artistWizardStep)) return;
+            if (artistWizardStep < ARTIST_WIZARD_STEPS) artistWizardShowStep(artistWizardStep + 1);
+        }
+        function artistWizardPrevStep() {
+            if (artistWizardStep > 1) artistWizardShowStep(artistWizardStep - 1);
+        }
+        function artistWizardGoToStep(step) {
+            if (step < artistWizardStep) artistWizardShowStep(step);
+        }
+
+        function openArtistModal() {
+            document.getElementById('artistForm').reset();
+            document.getElementById('artistSendCredentials').checked = true;
+            artistWizardShowStep(1);
+            openModal('artistModal');
+        }
+
+        async function saveArtist(event) {
+            event.preventDefault();
+
+            const idProofFile = document.getElementById('artistIdProof').files[0];
+            if (idProofFile && idProofFile.size > 5 * 1024 * 1024) {
+                showToast('ID proof file must be under 5MB', 'error');
+                return;
+            }
+
+            const sendCredentials = document.getElementById('artistSendCredentials').checked;
+
+            const formData = new FormData();
+            formData.append('name', document.getElementById('artistName').value);
+            formData.append('email', document.getElementById('artistEmail').value);
+            formData.append('phone', document.getElementById('artistPhone').value);
+            formData.append('location', document.getElementById('artistLocation').value);
+            formData.append('experience', document.getElementById('artistExperience').value);
+            formData.append('bio', document.getElementById('artistBio').value);
+            formData.append('specialties', document.getElementById('artistSkills').value);
+            formData.append('username', document.getElementById('artistUsername').value);
+            formData.append('password', document.getElementById('artistPassword').value);
+            formData.append('sendCredentials', sendCredentials);
+            formData.append('status', 'AVAILABLE');
+            if (idProofFile) formData.append('idProof', idProofFile);
+
+            try {
+                const token = localStorage.getItem('adminToken');
+                const response = await fetch('/api/admin/artists', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData,
+                });
+                if (response.status === 401) { logout(); return; }
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Artist added successfully!' + (sendCredentials ? ' Credentials emailed.' : ''));
+                    closeModal('artistModal');
+                    fetchArtists();
+                    document.getElementById('artistForm').reset();
+                    document.getElementById('artistSendCredentials').checked = true;
+                    loadLocationFilter();
+                } else {
+                    showToast(result.error || 'Failed to add artist', 'error');
+                }
+            } catch (e) {
+                showToast('Failed to add artist', 'error');
+            }
+        }
+
+        function clearArtistFilters() {
+            document.getElementById('artistSearchFilter').value = '';
+            document.getElementById('locationFilter').value = '';
+            document.getElementById('approvalFilter').value = '';
+            document.getElementById('artistDateFrom').value = '';
+            document.getElementById('artistDateTo').value = '';
+            fetchArtists();
+        }
+
+        async function fetchArtists() {
+            const search = document.getElementById('artistSearchFilter').value.trim();
+            const location = document.getElementById('locationFilter').value;
+            const approval = document.getElementById('approvalFilter') ? document.getElementById('approvalFilter').value : '';
+            const dateFrom = document.getElementById('artistDateFrom').value;
+            const dateTo = document.getElementById('artistDateTo').value;
+            let url = '/api/admin/artists?';
+            if (search) url += `search=${encodeURIComponent(search)}&`;
+            if (location) url += `location=${encodeURIComponent(location)}&`;
+            if (approval) url += `status=${encodeURIComponent(approval)}&`;
+            if (dateFrom) url += `dateFrom=${encodeURIComponent(dateFrom)}&`;
+            if (dateTo) url += `dateTo=${encodeURIComponent(dateTo)}&`;
+
+            try {
+                const data = await apiCall(url);
+                const container = document.getElementById('artistList');
+                currentArtistsList = (data.success && data.artists) ? data.artists : [];
+                if (data.success && data.artists.length) {
+                    let html = `
+                        <table class="w-full" style="min-width:1300px;">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Name</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Email</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Phone</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Location</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Specialities</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Status</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">ID Proof</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Approval</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Download Details</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    data.artists.forEach(a => {
+                        const statusColors = {
+                            'AVAILABLE': 'text-green-600 bg-green-50',
+                            'BUSY': 'text-yellow-600 bg-yellow-50',
+                            'UNAVAILABLE': 'text-red-600 bg-red-50'
+                        };
+                        const approvalColors = {
+                            'PENDING': 'text-yellow-600 bg-yellow-50',
+                            'VERIFIED': 'text-green-600 bg-green-50',
+                            'REJECTED': 'text-red-600 bg-red-50'
+                        };
+                        const skills = a.skills?.map(s => s.skill).join(', ') || 'N/A';
+                        const idProofCell = a.idProofUrl
+                            ? `<a href="${a.idProofUrl}" target="_blank" rel="noopener" class="text-blue-600 hover:text-blue-800 text-sm font-medium"><i class="fa-regular fa-id-card mr-1"></i>View</a>`
+                            : `<span class="text-xs text-gray-400">Not uploaded</span>`;
+                        const approvalBadge = `<span class="px-3 py-1 rounded-full text-xs font-semibold ${approvalColors[a.idProofStatus] || 'bg-gray-100'}">${a.isApproved ? 'APPROVED' : (a.idProofStatus || 'PENDING')}</span>`;
+                        // Rating has no column of its own — it only appears next to the approval badge once approved
+                        const ratingInline = a.isApproved ? ` <span class="ml-1.5 text-xs font-semibold text-amber-600 whitespace-nowrap">⭐ ${a.rating || 0}</span>` : '';
+                        const actionButtons = a.isApproved
+                            ? `<button onclick="rejectArtist('${a.id}')" class="text-red-600 hover:text-red-800 text-sm font-medium">Revoke</button>`
+                            : `
+                                <button onclick="approveArtist('${a.id}')" class="text-green-600 hover:text-green-800 text-sm font-medium mr-2">Approve</button>
+                                <button onclick="rejectArtist('${a.id}')" class="text-red-600 hover:text-red-800 text-sm font-medium">Reject</button>
+                            `;
+                        html += `
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="px-6 py-3.5 text-sm font-medium text-gray-800">${a.name}</td>
+                                <td class="px-6 py-3.5 text-sm text-gray-600">${a.email}</td>
+                                <td class="px-6 py-3.5 text-sm text-gray-600">${a.phone || 'N/A'}</td>
+                                <td class="px-6 py-3.5 text-sm text-gray-600">
+                                    <i class="fa-solid fa-location-dot text-purple-400 mr-1"></i>
+                                    ${a.location || 'N/A'}
+                                </td>
+                                <td class="px-6 py-3.5 text-sm text-gray-600">${skills}</td>
+                                <td class="px-6 py-3.5"><span class="px-3 py-1 rounded-full text-xs font-semibold ${statusColors[a.status] || 'bg-gray-100'}">${a.status}</span></td>
+                                <td class="px-6 py-3.5">${idProofCell}</td>
+                                <td class="px-6 py-3.5">${approvalBadge}${ratingInline}</td>
+                                <td class="px-6 py-3.5">
+                                    <button onclick="downloadArtistDetailsPdf('${a.id}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-50 text-purple-700 text-xs font-semibold hover:bg-purple-100">
+                                        <i class="fa-solid fa-file-arrow-down"></i> Download
+                                    </button>
+                                </td>
+                                <td class="px-6 py-3.5 whitespace-nowrap">${actionButtons}</td>
+                            </tr>
+                        `;
+                    });
+                    html += `</tbody></table>`;
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `
+                        <div class="py-12 text-center text-gray-400">
+                            <i class="fa-regular fa-user-tie text-3xl block mb-3"></i>
+                            <p class="text-sm">${location ? `No artists found in "${location}"` : 'No artists added yet'}</p>
+                            <button onclick="openArtistModal()" class="mt-3 text-sm text-purple-600 hover:text-purple-700 font-medium">+ Add Artist</button>
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                document.getElementById('artistList').innerHTML = `<div class="py-12 text-center text-gray-400">Failed to load artists</div>`;
+            }
+        }
+
+        // ---------- Single artist details PDF ----------
+        function downloadArtistDetailsPdf(id) {
+            const a = currentArtistsList.find(x => x.id === id);
+            if (!a) { showToast('Artist not found', 'error'); return; }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait' });
+            const marginX = 16;
+            let y = 20;
+
+            doc.setFontSize(16);
+            doc.setTextColor(147, 51, 234);
+            doc.text('Artist Details - Glam by Zebaish', marginX, y);
+            y += 6;
+            doc.setDrawColor(210, 190, 235);
+            doc.line(marginX, y, 194, y);
+            y += 10;
+
+            doc.setFontSize(10);
+            doc.setTextColor(120, 120, 120);
+            doc.text('Generated: ' + new Date().toLocaleString('en-IN'), marginX, y);
+            y += 12;
+
+            const field = (label, value) => {
+                doc.setFontSize(10.5);
+                doc.setTextColor(147, 51, 234);
+                doc.text(label, marginX, y);
+                doc.setTextColor(30, 30, 30);
+                const lines = doc.splitTextToSize(String(value || '-'), 130);
+                doc.text(lines, marginX + 45, y);
+                y += Math.max(8, lines.length * 6);
+            };
+
+            const skills = a.skills?.map(s => s.skill).join(', ') || '-';
+            const rating = a.isApproved ? (a.rating || 0) : 'Pending approval';
+            const approval = a.isApproved ? 'Approved' : (a.idProofStatus || 'Pending');
+
+            field('Name:', a.name);
+            field('Email:', a.email);
+            field('Username:', a.username || a.email);
+            field('Phone:', a.phone);
+            field('Location:', a.location);
+            field('Experience:', a.experience != null ? a.experience + ' yrs' : '-');
+            field('Specialities:', skills);
+            field('Status:', a.status);
+            field('Approval:', approval);
+            field('Rating:', rating);
+            field('Registered On:', a.createdAt ? new Date(a.createdAt).toLocaleDateString('en-IN') : '-');
+
+            y += 2;
+            doc.setFontSize(10.5);
+            doc.setTextColor(147, 51, 234);
+            doc.text('Details / Bio:', marginX, y);
+            y += 6;
+            doc.setTextColor(30, 30, 30);
+            doc.setFontSize(10);
+            const bioLines = doc.splitTextToSize(a.bio || 'Not provided', 178);
+            doc.text(bioLines, marginX, y);
+            y += bioLines.length * 5.5 + 10;
+
+            doc.setFontSize(10.5);
+            doc.setTextColor(147, 51, 234);
+            doc.text('ID Proof:', marginX, y);
+            if (a.idProofUrl) {
+                doc.setTextColor(37, 99, 235);
+                doc.textWithLink('View ID', marginX + 45, y, { url: a.idProofUrl });
+            } else {
+                doc.setTextColor(150, 150, 150);
+                doc.text('Not uploaded', marginX + 45, y);
+            }
+
+            doc.save((a.name || 'artist').replace(/\s+/g, '-').toLowerCase() + '-details.pdf');
+        }
+
+        function artistExportRows() {
+            return currentArtistsList.map(a => ({
+                Name: a.name || '',
+                Email: a.email || '',
+                Username: a.username || a.email || '',
+                Phone: a.phone || '',
+                Location: a.location || '',
+                'Experience (yrs)': a.experience != null ? a.experience : '',
+                Specialities: a.skills?.map(s => s.skill).join(', ') || '',
+                Details: a.bio || '',
+                Status: a.status || '',
+                Rating: a.isApproved ? (a.rating || 0) : 'Pending approval',
+                'ID Proof': a.idProofUrl || 'Not uploaded',
+                Approval: a.isApproved ? 'Approved' : (a.idProofStatus || 'Pending'),
+                'Registered On': a.createdAt ? new Date(a.createdAt).toLocaleDateString('en-IN') : '',
+            }));
+        }
+
+        function exportArtistsPdf() {
+            if (!currentArtistsList.length) { showToast('No data to export', 'error'); return; }
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape' });
+            doc.setFontSize(14);
+            doc.text('Artists - Glam by Zebaish', 14, 15);
+            doc.setFontSize(9);
+            doc.text('Generated: ' + new Date().toLocaleString('en-IN'), 14, 21);
+
+            const rows = artistExportRows().map(r => [
+                r.Name, r.Email, r.Username, r.Phone, r.Location, r['Experience (yrs)'],
+                r.Specialities, r.Status, r.Rating, r.Approval, r['Registered On']
+            ]);
+
+            doc.autoTable({
+                startY: 27,
+                head: [['Name', 'Email', 'Username', 'Phone', 'Location', 'Exp (yrs)', 'Specialities', 'Status', 'Rating', 'Approval', 'Registered On']],
+                body: rows,
+                styles: { fontSize: 7.5, cellPadding: 2.5 },
+                headStyles: { fillColor: [147, 51, 234] },
+            });
+
+            doc.save('artists-' + new Date().toISOString().split('T')[0] + '.pdf');
+        }
+
+        function exportArtistsExcel() {
+            if (!currentArtistsList.length) { showToast('No data to export', 'error'); return; }
+            const rows = artistExportRows();
+            const ws = XLSX.utils.json_to_sheet(rows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Artists');
+            XLSX.writeFile(wb, 'artists-' + new Date().toISOString().split('T')[0] + '.xlsx');
+        }
+
+        // ========================================
+        // APPROVE / REJECT ARTIST
+        // ========================================
+        async function approveArtist(id) {
+            if (!confirm('Approve this artist? They will be able to receive bookings.')) return;
+            try {
+                const result = await apiCall(`/api/admin/artists/${id}/approve`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ approved: true })
+                });
+                if (result.success) {
+                    showToast('Artist approved successfully!');
+                    fetchArtists();
+                } else {
+                    showToast(result.error || 'Failed to approve artist', 'error');
+                }
+            } catch (e) {
+                showToast('Failed to approve artist', 'error');
+            }
+        }
+
+        async function rejectArtist(id) {
+            const rejectionReason = prompt('Reason for rejecting this artist (optional):') || '';
+            try {
+                const result = await apiCall(`/api/admin/artists/${id}/approve`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ approved: false, rejectionReason })
+                });
+                if (result.success) {
+                    showToast('Artist rejected.');
+                    fetchArtists();
+                } else {
+                    showToast(result.error || 'Failed to reject artist', 'error');
+                }
+            } catch (e) {
+                showToast('Failed to reject artist', 'error');
+            }
+        }
+
+        // ========================================
+        // LOAD LOCATION FILTER OPTIONS
+        // ========================================
+        async function loadLocationFilter() {
+            try {
+                const data = await apiCall('/api/admin/artists/locations');
+                if (data.success && data.locations.length) {
+                    const select = document.getElementById('locationFilter');
+                    const defaultOption = select.querySelector('option[value=""]');
+                    select.innerHTML = '';
+                    select.appendChild(defaultOption);
+                    
+                    data.locations.forEach(location => {
+                        const option = document.createElement('option');
+                        option.value = location;
+                        option.textContent = location;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (e) {
+                console.error('Failed to load locations:', e);
+            }
+        }
+
+        // ========================================
+        // CUSTOMERS
+        // ========================================
+        async function fetchCustomers() {
+            try {
+                const data = await apiCall('/api/admin/customers');
+                const container = document.getElementById('customerList');
+                if (data.success && data.customers.length) {
+                    let html = `
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Name</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Email</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Phone</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Joined</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Orders</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    data.customers.forEach(c => {
+                        html += `
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="px-6 py-3.5 text-sm font-medium text-gray-800">${c.name}</td>
+                                <td class="px-6 py-3.5 text-sm text-gray-600">${c.email}</td>
+                                <td class="px-6 py-3.5 text-sm text-gray-600">${c.phone || 'N/A'}</td>
+                                <td class="px-6 py-3.5 text-sm text-gray-600">${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : 'N/A'}</td>
+                                <td class="px-6 py-3.5 text-sm text-gray-600">${c._count?.orders || 0}</td>
+                            </tr>
+                        `;
+                    });
+                    html += `</tbody></table>`;
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `
+                        <div class="py-12 text-center text-gray-400">
+                            <i class="fa-regular fa-users text-3xl block mb-3"></i>
+                            <p class="text-sm">No customers yet</p>
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                container.innerHTML = `<div class="py-12 text-center text-gray-400">Failed to load customers</div>`;
+            }
+        }
+
+        // ========================================
+        // PAYMENTS
+        // ========================================
+        async function fetchPayments() {
+            try {
+                const data = await apiCall('/api/admin/payments');
+                const container = document.getElementById('paymentList');
+                if (data.success && data.payments.length) {
+                    let html = `
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Payment ID</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Order</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Amount</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Status</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    data.payments.forEach(p => {
+                        html += `
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="px-6 py-3.5 text-sm text-gray-600">${p.paymentId || 'N/A'}</td>
+                                <td class="px-6 py-3.5 text-sm text-gray-600">#${p.order?.orderNumber || 'N/A'}</td>
+                                <td class="px-6 py-3.5 text-sm font-semibold text-gray-700">₹${p.amount.toLocaleString()}</td>
+                                <td class="px-6 py-3.5"><span class="px-3 py-1 rounded-full text-xs font-semibold ${p.status === 'PAID' ? 'bg-green-50 text-green-600' : 'bg-yellow-50 text-yellow-600'}">${p.status}</span></td>
+                                <td class="px-6 py-3.5 text-sm text-gray-600">${p.createdAt ? new Date(p.createdAt).toLocaleDateString() : 'N/A'}</td>
+                            </tr>
+                        `;
+                    });
+                    html += `</tbody></table>`;
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `
+                        <div class="py-12 text-center text-gray-400">
+                            <i class="fa-regular fa-credit-card text-3xl block mb-3"></i>
+                            <p class="text-sm">No payments yet</p>
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                container.innerHTML = `<div class="py-12 text-center text-gray-400">Failed to load payments</div>`;
+            }
+        }
+
+        // ========================================
+        // AFFILIATE
+        // ========================================
+        async function fetchAffiliate() {
+            try {
+                const data = await apiCall('/api/admin/affiliate');
+                if (data.success) {
+                    document.getElementById('totalCommission').textContent = `₹${(data.stats?.totalCommission || 0).toLocaleString()}`;
+                    document.getElementById('pendingCommission').textContent = `₹${(data.stats?.pendingCommission || 0).toLocaleString()}`;
+                    document.getElementById('approvedCommission').textContent = `₹${(data.stats?.approvedCommission || 0).toLocaleString()}`;
+                    document.getElementById('totalClicks').textContent = data.stats?.totalClicks || 0;
+
+                    // Two separate lists — customer referral codes and artist
+                    // referral codes are tracked independently (type: CUSTOMER
+                    // / ARTIST), even though they share the same table. No
+                    // commission numbers here yet — that table stays empty
+                    // until commission rules are defined.
+                    const renderAffiliateGroup = (containerId, list) => {
+                        const el = document.getElementById(containerId);
+                        if (!list.length) {
+                            el.innerHTML = `<div class="py-8 text-center text-gray-400 text-sm">None yet</div>`;
+                            return;
+                        }
+                        let html = `
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="text-left px-6 py-2.5 text-xs text-gray-500 uppercase">Name</th>
+                                        <th class="text-left px-6 py-2.5 text-xs text-gray-500 uppercase">Code</th>
+                                        <th class="text-left px-6 py-2.5 text-xs text-gray-500 uppercase">Referred</th>
+                                        <th class="text-left px-6 py-2.5 text-xs text-gray-500 uppercase">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        `;
+                        list.forEach(a => {
+                            html += `
+                                <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                    <td class="px-6 py-3 text-sm text-gray-600">${a.user?.name || 'N/A'}</td>
+                                    <td class="px-6 py-3 text-sm font-mono text-gray-700">${a.referralCode}</td>
+                                    <td class="px-6 py-3 text-sm text-gray-600">${a.totalRegistrations || 0}</td>
+                                    <td class="px-6 py-3"><span class="px-3 py-1 rounded-full text-xs font-semibold ${a.status === 'ACTIVE' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'}">${a.status}</span></td>
+                                </tr>
+                            `;
+                        });
+                        html += `</tbody></table>`;
+                        el.innerHTML = html;
+                    };
+
+                    const affiliates = data.affiliates || [];
+                    renderAffiliateGroup('customerAffiliateList', affiliates.filter(a => a.type === 'CUSTOMER'));
+                    renderAffiliateGroup('artistAffiliateList', affiliates.filter(a => a.type === 'ARTIST'));
+
+                    const container = document.getElementById('affiliateList');
+                    if (data.commissions && data.commissions.length) {
+                        let html = `
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Affiliate</th>
+                                        <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Order</th>
+                                        <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Amount</th>
+                                        <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Status</th>
+                                        <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        `;
+                        data.commissions.forEach(c => {
+                            html += `
+                                <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                    <td class="px-6 py-3.5 text-sm text-gray-600">${c.affiliate?.user?.name || 'N/A'}</td>
+                                    <td class="px-6 py-3.5 text-sm text-gray-600">#${c.order?.orderNumber || 'N/A'}</td>
+                                    <td class="px-6 py-3.5 text-sm font-semibold text-gray-700">₹${c.amount.toLocaleString()}</td>
+                                    <td class="px-6 py-3.5"><span class="px-3 py-1 rounded-full text-xs font-semibold ${c.status === 'APPROVED' ? 'bg-green-50 text-green-600' : c.status === 'PAID' ? 'bg-blue-50 text-blue-600' : 'bg-yellow-50 text-yellow-600'}">${c.status}</span></td>
+                                    <td class="px-6 py-3.5">
+                                        ${c.status === 'PENDING' ? `<button onclick="approveCommission('${c.id}')" class="text-green-600 hover:text-green-800 text-sm font-medium">Approve</button>` : ''}
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        html += `</tbody></table>`;
+                        container.innerHTML = html;
+                    } else {
+                        container.innerHTML = `<div class="py-12 text-center text-gray-400">No affiliate commissions yet</div>`;
+                    }
+                }
+            } catch (e) {
+                document.getElementById('affiliateList').innerHTML = `<div class="py-12 text-center text-gray-400">Failed to load affiliate data</div>`;
+            }
+        }
+
+        async function approveCommission(id) {
+            try {
+                const result = await apiCall(`/api/admin/affiliate/${id}/approve`, { method: 'PUT' });
+                if (result.success) {
+                    showToast('Commission approved!');
+                    fetchAffiliate();
+                }
+            } catch (e) {
+                showToast('Failed to approve commission', 'error');
+            }
+        }
+
+        function updateCommission() {
+            const percentage = prompt('Enter commission percentage:');
+            if (percentage && !isNaN(percentage)) {
+                apiCall('/api/admin/settings', {
+                    method: 'PUT',
+                    body: JSON.stringify({ key: 'commission_percentage', value: percentage })
+                }).then(() => {
+                    showToast(`Commission updated to ${percentage}%`);
+                }).catch(() => {
+                    showToast('Failed to update commission', 'error');
+                });
+            }
+        }
+
+        // ========================================
+        // REVIEWS
+        // ========================================
+        async function fetchReviews() {
+            try {
+                const data = await apiCall('/api/admin/reviews');
+                const container = document.getElementById('reviewList');
+                if (data.success && data.reviews.length) {
+                    let html = `
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Customer</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Service</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Rating</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Review</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Status</th>
+                                    <th class="text-left px-6 py-3 text-xs text-gray-500 uppercase">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    data.reviews.forEach(r => {
+                        html += `
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="px-6 py-3.5 text-sm text-gray-600">${r.user?.name || 'Guest'}</td>
+                                <td class="px-6 py-3.5 text-sm text-gray-600">${r.package?.name || '—'}</td>
+                                <td class="px-6 py-3.5 text-sm text-gray-600">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</td>
+                                <td class="px-6 py-3.5 text-sm text-gray-600 max-w-xs truncate">${r.title ? `<span class="font-semibold text-gray-800">${r.title}</span> — ` : ''}${r.comment || 'No comment'}</td>
+                                <td class="px-6 py-3.5"><span class="px-3 py-1 rounded-full text-xs font-semibold ${r.isApproved ? 'bg-green-50 text-green-600' : 'bg-yellow-50 text-yellow-600'}">${r.isApproved ? 'Approved' : 'Pending'}</span></td>
+                                <td class="px-6 py-3.5">
+                                    ${!r.isApproved ? `<button onclick="approveReview('${r.id}')" class="text-green-600 hover:text-green-800 text-sm font-medium">Approve</button>` : ''}
+                                    ${r.images && r.images.length ? `<a href="${r.images[0]}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm font-medium ml-2">View Image${r.images.length > 1 ? ` (+${r.images.length - 1})` : ''}</a>` : ''}
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    html += `</tbody></table>`;
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `
+                        <div class="py-12 text-center text-gray-400">
+                            <i class="fa-regular fa-star text-3xl block mb-3"></i>
+                            <p class="text-sm">No reviews yet</p>
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                container.innerHTML = `<div class="py-12 text-center text-gray-400">Failed to load reviews</div>`;
+            }
+        }
+
+        async function approveReview(id) {
+            try {
+                const result = await apiCall(`/api/admin/reviews/${id}/approve`, { method: 'PUT' });
+                if (result.success) {
+                    showToast('Review approved!');
+                    fetchReviews();
+                }
+            } catch (e) {
+                showToast('Failed to approve review', 'error');
+            }
+        }
+
+        // ========================================
+        // SEARCH
+        // ========================================
+        function handleSearch(value) {
+            if (value.length > 2) {
+                fetch(`/api/admin/search?q=${encodeURIComponent(value)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success && data.orders) {
+                            renderOrders(data.orders, 'ordersTable');
+                        }
+                    })
+                    .catch(console.error);
+            } else if (value.length === 0) {
+                fetchDashboard();
+            }
+        }
+
+        function exportOrders() {
+            showToast('Exporting orders...', 'info');
+            window.open('/api/admin/orders/export', '_blank');
+        }
+
+        // ========================================
+        // SET DATE
+        // ========================================
+        function setCurrentDate() {
+            const now = new Date();
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', {
+                year: 'numeric', month: 'short', day: 'numeric'
+            });
+        }
+
+        // ========================================
+        // INITIALIZE
+        // ========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!checkAuth()) return;
+            loadAdminData();
+            setCurrentDate();
+            fetchNotifications();
+            fetchDashboard();
+            loadLocationFilter();
+
+            // Sidebar navigation
+            document.querySelectorAll('.nav-link[data-section]').forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const section = this.dataset.section;
+                    if (section) {
+                        switchSection(section);
+                        history.replaceState(null, '', window.location.pathname);
+                    }
+                });
+            });
+
+            // Load package names for filter
+            apiCall('/api/admin/packages').then(data => {
+                if (data.success && data.packages) {
+                    const select = document.getElementById('packageFilter');
+                    data.packages.forEach(p => {
+                        const option = document.createElement('option');
+                        option.value = p.id;
+                        option.textContent = p.name;
+                        select.appendChild(option);
+                    });
+                }
+            });
+
+            // Auto-refresh every 30 seconds
+            setInterval(() => {
+                if (document.getElementById('section-dashboard').classList.contains('active')) {
+                    fetchDashboard();
+                }
+                fetchNotifications();
+            }, 30000);
+
+            // Close dropdown on outside click
+            document.addEventListener('click', function(e) {
+                const dropdown = document.getElementById('notificationDropdown');
+                const bell = document.querySelector('.relative button');
+                if (dropdown && !dropdown.contains(e.target) && !bell?.contains(e.target)) {
+                    dropdown.classList.remove('open');
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

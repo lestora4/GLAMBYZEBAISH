@@ -1,0 +1,522 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  phone        String?
+  password     String
+  name         String
+  role         String   @default("CUSTOMER")
+  referralCode String?  @unique
+  resetToken       String?   @unique
+  resetTokenExpiry DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  accounts     Account[]
+  sessions     Session[]
+  orders       Order[]
+  addresses    Address[]
+  reviews      Review[]
+  affiliate    Affiliate?
+  notifications Notification[]
+
+  // Set once, at signup, if this customer registered using a valid
+  // affiliate's referral code. Tracking only for now — no commission
+  // rules exist yet; once the client defines a commission structure,
+  // this link is what future payout logic will read from.
+  referredByAffiliateId String?
+  referredByAffiliate   Affiliate? @relation("AffiliateReferrals", fields: [referredByAffiliateId], references: [id])
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Admin {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  name       String
+  password   String
+  role       AdminRole @default(ADMIN)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("admins")
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  SUPPORT
+}
+
+enum ArtistStatus {
+  AVAILABLE
+  BUSY
+  UNAVAILABLE
+  AWAY
+}
+
+model Artist {
+  id             String   @id @default(cuid())
+  name           String
+  email          String   @unique
+  username       String?  @unique
+  phone          String?
+  password       String
+  bio            String?
+  experience     Int      @default(0)
+  rating         Float    @default(0)
+  totalReviews   Int      @default(0)
+  imageUrl       String?
+  status         ArtistStatus @default(AVAILABLE)
+  location       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // === NEW FIELDS FOR ID PROOF ===
+  idProofUrl      String?   
+  idProofPublicId String?   
+  idProofStatus   String    @default("PENDING")
+  rejectionReason String?
+  isApproved      Boolean   @default(false)
+  approvedAt      DateTime?
+
+  resetToken       String?   @unique
+  resetTokenExpiry DateTime?
+
+  skills         ArtistSkill[]
+  availability   ArtistAvailability[]
+  bookings       Order[]
+
+  @@map("artists")
+  @@index([email])
+  @@index([username])
+  @@index([status])
+  @@index([isApproved])
+  @@index([location])
+}model ArtistSkill {
+  id         String   @id @default(cuid())
+  artistId   String
+  skill      String
+  level      Int      @default(3)
+  createdAt  DateTime @default(now())
+
+  artist     Artist   @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@unique([artistId, skill])
+  @@map("artist_skills")
+}
+
+model ArtistAvailability {
+  id         String   @id @default(cuid())
+  artistId   String
+  dayOfWeek  Int
+  startTime  String
+  endTime    String
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  artist     Artist   @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@unique([artistId, dayOfWeek])
+  @@map("artist_availability")
+}
+
+model Package {
+  id              String          @id @default(cuid())
+  name            String
+  slug            String          @unique
+  description     String
+  shortDescription String?
+  price           Float
+  gst             Float           @default(18)
+  duration        Int
+  category        PackageCategory @default(BRIDAL)
+  images          String[]        @default([])
+  whatsIncluded   String[]        @default([])
+  isActive        Boolean         @default(true)
+  sortOrder       Int             @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  orders          Order[]
+  reviews         Review[]
+
+  @@map("packages")
+}
+
+enum PackageCategory {
+  BRIDAL
+  PARTY
+  RECEPTION
+  HD_MAKEUP
+  AIRBRUSH
+  HAIR_STYLING
+  PRE_WEDDING
+  EDITORIAL
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique
+  // Orders created together from one combined checkout (2+ packages, each
+  // with its own date/time/address, paid in a single payment) share this
+  // groupId. Single-package bookings still get a groupId — it's just a
+  // group of one — so dashboards/APIs never need to special-case "no group".
+  groupId         String
+  customerId      String
+  artistId        String?
+  packageId       String
+  date            DateTime
+  time            String
+  location        String
+  addressId       String?
+  specialNotes    String?
+  status          OrderStatus @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+  amount          Float
+  gst             Float       @default(0)
+  discount        Float       @default(0)
+  totalAmount     Float
+  paymentId       String?
+  refundId        String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  customer        User        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  artist          Artist?     @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  package         Package     @relation(fields: [packageId], references: [id])
+  address         Address?    @relation(fields: [addressId], references: [id])
+  payment         Payment?
+  review          Review?
+
+  @@map("orders")
+  @@index([customerId])
+  @@index([artistId])
+  @@index([status])
+  @@index([date])
+  @@index([groupId])
+}
+
+// A single, admin-managed discount code (e.g. "ZEBA10") with a hard cap on
+// how many times it can ever be redeemed. usedCount is only ever
+// incremented inside the conditional update in /api/orders/create — that
+// update's WHERE clause (isActive: true, usedCount < maxUses) is what
+// makes the 100-redemption cap race-safe under concurrent checkouts,
+// rather than relying on reading usedCount and writing it back separately.
+model Coupon {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  discountPct   Float    @default(10)
+  maxUses       Int      @default(100)
+  usedCount     Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  redemptions   CouponRedemption[]
+
+  @@map("coupons")
+}
+
+// One row per successful redemption (one per paid/pending groupId), so the
+// 100 winners are always individually auditable from the admin side even
+// though Coupon.usedCount is the number actually enforced at checkout time.
+model CouponRedemption {
+  id             String   @id @default(cuid())
+  couponId       String
+  groupId        String   @unique
+  customerEmail  String
+  discountAmount Float
+  createdAt      DateTime @default(now())
+
+  coupon         Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+
+  @@map("coupon_redemptions")
+  @@index([couponId])
+}
+
+enum OrderStatus {
+  PENDING
+  ASSIGNED
+  ACCEPTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  RESCHEDULED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+model Address {
+  id           String   @id @default(cuid())
+  userId       String
+  label        String   @default("Home")
+  fullName     String
+  phone        String
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  state        String
+  pincode      String
+  country      String   @default("India")
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders       Order[]
+
+  @@map("addresses")
+  @@index([userId])
+}
+
+model Payment {
+  id              String   @id @default(cuid())
+  orderId         String   @unique
+  amount          Float
+  currency        String   @default("INR")
+  paymentId       String
+  orderIdRazorpay String?  // unused now that PhonePe is the active gateway; kept so no data is lost
+  signature       String?  // unused now that PhonePe is the active gateway; kept so no data is lost
+  // PhonePe's merchantOrderId for this payment attempt. NOT globally unique
+  // any more: a combined checkout (multiple Orders, one payment) creates one
+  // Payment row per Order but stamps them all with the SAME merchantOrderId,
+  // so the webhook/verify routes can find + settle every order in the group
+  // from the single id PhonePe gives back. Order.groupId is the other half
+  // of that pairing.
+  merchantOrderId String?
+  gateway         String   @default("PHONEPE") // which gateway processed this payment
+  status          PaymentStatus @default(PENDING)
+  method          String?
+  refundId        String?
+  refundAmount    Float?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  order           Order    @relation(fields: [orderId], references: [id])
+
+  @@map("payments")
+  @@index([merchantOrderId])
+}
+
+model Review {
+  id             String   @id @default(cuid())
+  orderId        String   @unique
+  userId         String
+  // Denormalized from order.packageId at creation time so the service-detail
+  // page can fetch "reviews for this service" with a single indexed query
+  // instead of joining through orders for every render.
+  packageId      String
+  artistId       String?
+  rating         Int
+  title          String?
+  comment        String?
+  images         String[] @default([])
+  // Cloudinary public_ids paired 1:1 with `images`, kept so an admin/cleanup
+  // job can delete the underlying asset without having to derive the id
+  // back out of the URL.
+  imagePublicIds String[] @default([])
+  isApproved     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  order          Order    @relation(fields: [orderId], references: [id])
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  package        Package  @relation(fields: [packageId], references: [id])
+
+  @@map("reviews")
+  @@index([userId])
+  @@index([artistId])
+  @@index([rating])
+  @@index([packageId])
+}
+
+model Affiliate {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  referralCode      String   @unique
+  type              AffiliateType @default(ARTIST)
+  totalClicks       Int      @default(0)
+  totalRegistrations Int     @default(0)
+  totalCommission   Float    @default(0)
+  pendingCommission Float    @default(0)
+  approvedCommission Float   @default(0)
+  status            AffiliateStatus @default(ACTIVE)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clicks            AffiliateClick[]
+  commissions       AffiliateCommission[]
+
+  // Customers who registered using THIS affiliate's referral code.
+  // Tracking only, for now — see the matching comment on User above.
+  referredUsers     User[]   @relation("AffiliateReferrals")
+
+  @@map("affiliates")
+}
+
+enum AffiliateStatus {
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+}
+
+// Keeps customer and artist affiliates as two clearly separate groups
+// for reporting/admin purposes, even though they share the same
+// underlying tracking (clicks, registrations, commissions) mechanism.
+enum AffiliateType {
+  CUSTOMER
+  ARTIST
+}
+
+model AffiliateClick {
+  id          String   @id @default(cuid())
+  affiliateId String
+  ipAddress   String?
+  userAgent   String?
+  clickedAt   DateTime @default(now())
+
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  @@map("affiliate_clicks")
+}
+
+model AffiliateCommission {
+  id          String   @id @default(cuid())
+  affiliateId String
+  orderId     String
+  amount      Float
+  status      CommissionStatus @default(PENDING)
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  @@map("affiliate_commissions")
+}
+
+enum CommissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PAID
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  message     String
+  type        NotificationType @default(GENERAL)
+  isRead      Boolean  @default(false)
+  link        String?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+  @@index([userId])
+  @@index([isRead])
+}
+
+enum NotificationType {
+  BOOKING
+  PAYMENT
+  ARTIST_ASSIGNED
+  REMINDER
+  PROMOTIONAL
+  GENERAL
+  SYSTEM
+}
+
+model EmailLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  to        String
+  subject   String
+  type      String
+  status    String
+  error     String?
+  createdAt DateTime @default(now())
+
+  @@map("email_logs")
+  @@index([userId])
+  @@index([status])
+}
+
+model Setting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String   @db.Text
+  description String?
+  category    String   @default("general")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("settings")
+}
+
+model Invoice {
+  id          String   @id @default(cuid())
+  orderId     String   @unique
+  invoiceNumber String @unique
+  pdfUrl      String?
+  generatedAt DateTime @default(now())
+
+  @@map("invoices")
+}

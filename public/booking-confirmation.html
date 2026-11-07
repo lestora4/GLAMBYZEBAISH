@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1635552701268110');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1635552701268110&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+<meta charset="UTF-8">
+    <meta name="color-scheme" content="light only">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booking Confirmed - Glam by Zebaish</title>
+<link rel="icon" href="favicon.ico">
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+    body {
+        background: #f8f5fb;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+    .card {
+        max-width: 480px;
+        width: 100%;
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 36px 32px;
+        box-shadow: 0 8px 30px rgba(45, 27, 78, 0.08);
+        border: 1px solid #E8E0EE;
+        text-align: center;
+    }
+    .icon-circle {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #28a745, #34c759);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 34px;
+        color: #fff;
+    }
+    h1 { color: #2d1b4e; font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; }
+    .sub { color: #6b6178; font-size: 0.9rem; margin-bottom: 24px; }
+    .status-pill {
+        display: inline-block;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        margin-bottom: 22px;
+        background: #fff3cd;
+        color: #856404;
+    }
+    .status-pill.paid { background: #d4f8e8; color: #1a7f4e; }
+    .details {
+        text-align: left;
+        background: #FAF7FC;
+        border: 1px solid #E8E0EE;
+        border-radius: 12px;
+        padding: 18px 20px;
+        margin-bottom: 24px;
+    }
+    .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.85rem; }
+    .row span:first-child { color: #8a7f96; }
+    .row span:last-child { color: #2d1b4e; font-weight: 600; text-align: right; }
+    .note {
+        font-size: 0.8rem;
+        color: #6b6178;
+        line-height: 1.5;
+        margin-bottom: 24px;
+    }
+    .btn {
+        display: inline-block;
+        text-decoration: none;
+        width: 100%;
+        padding: 12px;
+        border-radius: 30px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: #2d1b4e;
+        background: linear-gradient(135deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+        margin-bottom: 10px;
+    }
+    .btn.secondary {
+        background: #fff;
+        border: 1.5px solid #E8E0EE;
+        color: #6b6178;
+    }
+    .loading { color: #8a7f96; font-size: 0.9rem; padding: 40px 0; }
+</style>
+<style id="glam-uniform-design">
+/* Glam by Zebaish unified CTA system */
+button[type="submit"], button.glam-pkg-addcart, .glam-checkout-btn, .capsule-login-btn, .book-now-btn, .hero-slide-btn, .w-button, .button, .btn {
+  background:#460c61 !important;
+  color:#fff !important;
+  border:1px solid #460c61 !important;
+  min-height:48px !important;
+  padding:0 24px !important;
+  border-radius:10px !important;
+  font-size:.82rem !important;
+  font-weight:800 !important;
+  letter-spacing:.7px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:8px !important;
+  box-shadow:0 6px 18px rgba(70,12,97,.16) !important;
+  text-decoration:none !important;
+  transition:all .2s ease !important;
+}
+button[type="submit"]:hover, button.glam-pkg-addcart:hover, .glam-checkout-btn:hover, .capsule-login-btn:hover, .book-now-btn:hover, .hero-slide-btn:hover, .w-button:hover, .button:hover, .btn:hover {
+  background:#5b1478 !important; color:#fff !important; transform:translateY(-1px);
+}
+/* Dark/image sections: clean white CTA with purple label */
+.hero-slide .hero-slide-btn, .dark-section button, .dark-section .button, .dark-section .btn, .footer button, .footer .button, .footer .btn {
+  background:#fff !important; color:#460c61 !important; border-color:#fff !important;
+}
+.hero-slide .hero-slide-btn:hover, .dark-section button:hover, .dark-section .button:hover, .dark-section .btn:hover, .footer button:hover, .footer .button:hover, .footer .btn:hover {
+  background:#f5eef8 !important; color:#460c61 !important;
+}
+/* Auth actions should never be tiny */
+.capsule-login-btn { width:100% !important; min-width:0 !important; height:50px !important; padding:0 28px !important; border-radius:12px !important; font-size:.88rem !important; }
+.signature-glam-slider-title { white-space:nowrap; }
+@media(max-width:600px){.signature-glam-slider-title{font-size:clamp(1.7rem,8vw,2.5rem);white-space:normal;}.capsule-login-btn{height:50px !important;}}
+</style>
+</head>
+<body>
+
+<div class="card" id="card">
+    <div class="loading" id="loadingMsg">Loading your booking...</div>
+</div>
+
+<script>
+async function loadOrder() {
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('order');
+    const card = document.getElementById('card');
+
+    if (!orderId) {
+        card.innerHTML = '<h1>Booking confirmation</h1><p class="sub">No order reference was provided.</p><a class="btn" href="/dashboard#orders">Go to My Orders</a>';
+        return;
+    }
+
+    const token = localStorage.getItem('userToken');
+    if (!token) {
+        window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/orders/' + orderId, {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+
+        if (!data.success) {
+            card.innerHTML = '<h1>Couldn\'t load booking</h1><p class="sub">' + (data.error || 'Please check My Orders instead.') + '</p><a class="btn" href="/dashboard#orders">Go to My Orders</a>';
+            return;
+        }
+
+        const order = data.order;
+        const paid = order.paymentStatus === 'PAID';
+        const dateObj = new Date(order.date);
+        const formattedDate = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        card.innerHTML = `
+            <div class="icon-circle">${paid ? '✓' : '⏳'}</div>
+            <h1>${paid ? 'Booking Confirmed!' : 'Payment Pending'}</h1>
+            <p class="sub">Order #${order.orderNumber}</p>
+            <div class="status-pill ${paid ? 'paid' : ''}">
+                ${paid ? 'PAYMENT RECEIVED' : 'AWAITING PAYMENT CONFIRMATION'}
+            </div>
+            <div class="details">
+                <div class="row"><span>Package</span><span>${order.package.name}</span></div>
+                <div class="row"><span>Date</span><span>${formattedDate}</span></div>
+                <div class="row"><span>Time</span><span>${order.time}</span></div>
+                <div class="row"><span>Location</span><span>${order.location}</span></div>
+                <div class="row"><span>Amount</span><span>₹${order.totalAmount.toLocaleString()}</span></div>
+                <div class="row"><span>Booking status</span><span>${order.status}</span></div>
+            </div>
+            <p class="note">
+                ${paid
+                    ? "We've emailed your confirmation. Your booking status will show as <strong>Pending</strong> until we assign a makeup artist — that's expected, not an error. You'll get another email the moment an artist is assigned."
+                    : "We haven't received payment confirmation yet. If money was deducted from your account, it should confirm within a few minutes — refresh this page or check My Orders shortly."}
+            </p>
+            <a class="btn" href="/dashboard#orders">View My Orders</a>
+            <a class="btn secondary" href="/">Back to Home</a>
+        `;
+    } catch (err) {
+        card.innerHTML = '<h1>Something went wrong</h1><p class="sub">Please check My Orders for your booking status.</p><a class="btn" href="/dashboard#orders">Go to My Orders</a>';
+    }
+}
+
+loadOrder();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "name": "glam-by-zeba",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "npx prisma generate && npx next build",
+    "start": "next start",
+    "lint": "next lint",
+    "start:prod": "NODE_ENV=production next start",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@prisma/client": "5.22.0",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.10.0",
+    "jsonwebtoken": "^9.0.3",
+    "next": "14.2.3",
+    "nodemailer": "^9.0.3",
+    "razorpay": "^2.9.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "@types/react": "^18.2.61",
+    "@types/react-dom": "^18.2.19",
+    "prisma": "5.22.0",
+    "typescript": "^5.3.3"
+  }
+}
